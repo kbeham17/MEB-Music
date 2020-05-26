@@ -33,7 +33,7 @@
         android:layout_marginBottom="550dp"
         android:fontFamily="@font/light"
         android:text="Schön, dich wieder zu sehen!"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/lightwhite"
         android:textSize="19sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
