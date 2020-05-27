@@ -8,10 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -24,7 +21,6 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import at.htlgkr.mebmusic.fragment.LogoutFragment;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
@@ -37,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private String email;
     private String id;
 
-    private LogoutFragment logoutFragment = new LogoutFragment();
+    //private LogoutFragment logoutFragment = new LogoutFragment();
     private PlaylistFragment playlistFragment = new PlaylistFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
     private SearchFragment searchFragment = new SearchFragment();
@@ -88,18 +84,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             setFragment(searchFragment);
                             return true;
                         case R.id.menu_logout:
-                            profileFragment = new ProfileFragment();
-                            setFragment(profileFragment);
-                                    Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
-                                        @Override
-                                        public void onResult(@NonNull Status status) {
-                                            if(status.isSuccess()){
-                                                gotoStartActivity();
-                                            } else {
-                                                Toast.makeText(MainActivity.this,"Login Failed!", Toast.LENGTH_LONG).show();
-                                            }
-                                        }
-                                    });
+                            //profileFragment = new ProfileFragment();
+                            //setFragment(profileFragment);
+                            Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(@NonNull Status status) {
+                                    if(status.isSuccess()){
+                                        gotoStartActivity();
+                                    } else {
+                                        Toast.makeText(MainActivity.this,"Logout Failed!", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
 
                             return true;
                         default:
@@ -110,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }
         });
-
 
     }
 
