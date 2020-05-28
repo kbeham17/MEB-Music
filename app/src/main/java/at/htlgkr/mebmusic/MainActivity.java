@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if(result.isSuccess()){
             GoogleSignInAccount account = result.getSignInAccount();
 
-            profile_image_url = account.getPhotoUrl().toString();
+            //profile_image_url = account.getPhotoUrl().toString();
             name = account.getDisplayName();
             email = account.getEmail();
             id = account.getId();
