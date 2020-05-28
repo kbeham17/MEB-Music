@@ -8,10 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -20,11 +17,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import at.htlgkr.mebmusic.fragment.LogoutFragment;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private String email;
     private String id;
 
-    private LogoutFragment logoutFragment = new LogoutFragment();
+
     private PlaylistFragment playlistFragment = new PlaylistFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
     private SearchFragment searchFragment = new SearchFragment();
@@ -88,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             setFragment(searchFragment);
                             return true;
                         case R.id.menu_logout:
-                            profileFragment = new ProfileFragment();
-                            setFragment(profileFragment);
                                     Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
                                         @Override
                                         public void onResult(@NonNull Status status) {
@@ -128,10 +124,30 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if(result.isSuccess()){
             GoogleSignInAccount account = result.getSignInAccount();
 
-            profile_image_url = account.getPhotoUrl().toString();
+            //profile_image_url = account.getPhotoUrl().toString();
             name = account.getDisplayName();
             email = account.getEmail();
             id = account.getId();
+
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
+
+        if (opr.isDone()){
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        } else {
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(@NonNull GoogleSignInResult result) {
+                    handleSignInResult(result);
+                }
+            });
         }
     }
 
