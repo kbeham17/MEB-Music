@@ -75,7 +75,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -95,7 +94,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemCount() {
         return playlists.size();
     }
-
 }
 
 

@@ -106,6 +106,9 @@ public class PlaylistFragment extends Fragment {
         adapter = new PlaylistAdapter(getContext(), playlistList);
         rv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+}
+
 
 //        Call<ModelPlaylist> data = YoutubeAPI.getPlaylistVideo().getYT("https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg");
 //        data.enqueue(new Callback<ModelPlaylist>() {
@@ -127,7 +130,4 @@ public class PlaylistFragment extends Fragment {
 //                Log.e(TAG, "onFailure playlist: ", t);
 //            }
 //        });
-    }
-}
-
 //"https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg"
