@@ -92,13 +92,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
     public int getItemCount() {
-        return 0;
+        return playlists.size();
     }
 
 }
