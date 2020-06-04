@@ -1,16 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/discordgrey"
+    android:backgroundTint="@color/discordgrey"
     tools:context=".fragment.ProfileFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
-    <Button
-        android:id="@+id/buttonPreference"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Settings" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_google_profile_picture"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginLeft="130dp"
+                android:layout_marginTop="100dp"
+                android:layout_marginRight="130dp"
+                tools:src="@tools:sample/avatars[0]" />
+
+            <TextView
+                android:id="@+id/text_google_name"
+                android:layout_width="412dp"
+                android:layout_height="29dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/light"
+                android:text="Hallo"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_playlist_thumb" />
+
+            <Button
+                android:id="@+id/buttonPreference"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="150dp"
+                android:layout_marginTop="100dp"
+                android:layout_marginRight="150dp"
+                android:layout_marginBottom="20dp"
+                android:text="Settings" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>
