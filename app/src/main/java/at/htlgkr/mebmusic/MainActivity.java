@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -22,6 +24,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
@@ -35,10 +38,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static String id;
 
 
-    private PlaylistFragment playlistFragment = new PlaylistFragment();
+    private PlaylistFragment playlistFragment = new PlaylistFragment("");
     private ProfileFragment profileFragment = new ProfileFragment(null, null);
     private SearchFragment searchFragment = new SearchFragment();
     private BottomNavigationView menuBottomNavigationView;
+
+
+    private SharedPreferences prefs;
+
 
     public static GoogleApiClient googleApiClient;
     private GoogleSignInOptions gso;
@@ -49,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         gotoStartActivity();
 
@@ -80,7 +90,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                             return true;
                         case R.id.menu_playlist:
-                            playlistFragment = new PlaylistFragment();
+                            String channelId = prefs.getString("edit_text_channelId", "channelId=UCMnR3J-chev22dTqJEquFcg");
+                            if (channelId.equals("")){
+                                channelId = "&channelId=UCMnR3J-chev22dTqJEquFcg";
+                            }
+                            playlistFragment = new PlaylistFragment(channelId);
                             setFragment(playlistFragment);
                             return true;
                         case R.id.menu_search:
@@ -139,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             name = account.getDisplayName();
             email = account.getEmail();
             id = account.getId();
+
+
+
         }
     }
 

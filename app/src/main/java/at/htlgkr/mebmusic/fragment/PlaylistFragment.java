@@ -44,32 +44,32 @@ public class PlaylistFragment extends Fragment {
     private PlaylistAdapter adapter;
     private LinearLayoutManager manager;
     private List<Playlist> playlistList = new ArrayList<>();
-    private RecyclerView rv;
+    private String CHANNELID;
 
-    public PlaylistFragment() {
-        // Required empty public constructor
+    public PlaylistFragment(String channelId) {
+        this.CHANNELID = channelId;
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playlist, container,false);
-        // Inflate the layout for this fragment
-        rv = view.findViewById(R.id.recycler_playlist);
+
+        RecyclerView rv = view.findViewById(R.id.recycler_playlist);
         adapter = new PlaylistAdapter(getContext(), playlistList);
         manager = new LinearLayoutManager(getContext());
         rv.setAdapter(adapter);
         rv.setLayoutManager(manager);
 
-        if(playlistList.size() == 0 ){
-            getJson();
-        }
+        playlistList.clear();
+        getJson();
+
         rv.setHasFixedSize(true);
         return view;
     }
 
     private void getJson(){
-        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST + YoutubeAPI.CHANNELID + YoutubeAPI.KEY ;
+        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST + CHANNELID + YoutubeAPI.KEY ;
         GETTask getTask = new GETTask(url);
         getTask.execute();
 
@@ -103,12 +103,7 @@ public class PlaylistFragment extends Fragment {
             }
 
         }
-        adapter = new PlaylistAdapter(getContext(), playlistList);
-        rv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-    }
-}
-
 
 //        Call<ModelPlaylist> data = YoutubeAPI.getPlaylistVideo().getYT("https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg");
 //        data.enqueue(new Callback<ModelPlaylist>() {
@@ -130,4 +125,7 @@ public class PlaylistFragment extends Fragment {
 //                Log.e(TAG, "onFailure playlist: ", t);
 //            }
 //        });
+    }
+}
+
 //"https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg"

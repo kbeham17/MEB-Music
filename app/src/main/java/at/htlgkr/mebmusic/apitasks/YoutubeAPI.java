@@ -12,7 +12,7 @@ public class YoutubeAPI {
     public static final String BASE = "https://www.googleapis.com/youtube/v3/";
     public static final String KEY = "&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg";
     //Vasi API KEY: AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg
-    //Stefan API KEY:
+    //Stefan API KEY: AIzaSyA6c0fMsjJOMwZcsKxGt9JVh8pPiz13rPw
     //Kevin API KEY: AIzaSyB6AupkZ2-GIGeNas6m7pGYwH5nYpcHJ4o
 
     public static final String PLAYLIST = "playlists?";
@@ -25,7 +25,10 @@ public class YoutubeAPI {
     public static final String ORDER = "&order=date";
     public static final String PART = "&part=snippet";
 
+    public static final String QUERY = "&q=";
+    public static final String TYPE = "&type=video";
 
+}
 
     /*public interface PlaylistVideo{
         @GET
@@ -44,4 +47,3 @@ public class YoutubeAPI {
         }
         return playlistVideo;
     }*/
-}

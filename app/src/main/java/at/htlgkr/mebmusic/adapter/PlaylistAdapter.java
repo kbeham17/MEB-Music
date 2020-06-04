@@ -1,11 +1,9 @@
 package at.htlgkr.mebmusic.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,8 +19,6 @@ import java.util.List;
 
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.playlist.Playlist;
-
-import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -40,9 +36,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public YoutubeHolder(View itemView){
             super(itemView);
-            playlistThumbail = itemView.findViewById(R.id.iv_playlist_thumb);
-            title = itemView.findViewById(R.id.text_playlist_title);
-            video_count1 = itemView.findViewById(R.id.text_video_count1);
+            playlistThumbail = itemView.findViewById(R.id.iv_video_thumb);
+            title = itemView.findViewById(R.id.text_video_title);
+            video_count1 = itemView.findViewById(R.id.text_video_date);
             video_count2 = itemView.findViewById(R.id.text_video_count2);
         }
 
