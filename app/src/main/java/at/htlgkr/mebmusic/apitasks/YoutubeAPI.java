@@ -10,7 +10,11 @@ import retrofit2.http.Url;*/
 
 public class YoutubeAPI {
     public static final String BASE = "https://www.googleapis.com/youtube/v3/";
-    public static final String KEY = "&key=AIzaSyB6AupkZ2-GIGeNas6m7pGYwH5nYpcHJ4o";
+    public static final String KEY = "&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg";
+    //Vasi API KEY: AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg
+    //Stefan API KEY:
+    //Kevin API KEY: AIzaSyB6AupkZ2-GIGeNas6m7pGYwH5nYpcHJ4o
+
     public static final String PLAYLIST = "playlists?";
     public static final String PART_PLAYLIST = "&part=snippet,contentDetails";
     public static final String CHANNELID = "&channelId=UCMnR3J-chev22dTqJEquFcg";

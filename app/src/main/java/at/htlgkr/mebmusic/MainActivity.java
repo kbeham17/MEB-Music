@@ -139,9 +139,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             name = account.getDisplayName();
             email = account.getEmail();
             id = account.getId();
-
-
-
         }
     }
 
