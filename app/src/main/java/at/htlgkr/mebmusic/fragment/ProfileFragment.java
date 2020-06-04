@@ -10,6 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import at.htlgkr.mebmusic.PreferenceActivity;
 import at.htlgkr.mebmusic.R;
@@ -20,9 +25,16 @@ import at.htlgkr.mebmusic.R;
 public class ProfileFragment extends Fragment {
 
     private static final int RQ_PREFERENCES = 101;
+    private static View view;
 
-    public ProfileFragment() {
-        // Required empty public constructor
+    private static TextView textGoogleName;
+    private static ImageView googleProfilePicture;
+    private String name;
+    private String profilePictureUrl;
+
+    public ProfileFragment(String name, String profile_picture_url) {
+        this.profilePictureUrl = profile_picture_url;
+        this.name = name;
     }
 
     @Override
@@ -30,8 +42,9 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_profile, container, false);
+        view = inflater.inflate(R.layout.fragment_profile, container, false);
         initializeView(view);
+        setupProfile(view);
         return view;
     }
 
@@ -45,4 +58,47 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+
+    public void setupProfile(View view) {
+        if (profilePictureUrl != null && name != null) {
+            textGoogleName = view.findViewById(R.id.text_google_name);
+            googleProfilePicture = view.findViewById(R.id.iv_google_profile_picture);
+
+            textGoogleName.setText(name);
+            Picasso.get()
+                    .load(profilePictureUrl)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .fit()
+                    .centerCrop()
+                    .into(googleProfilePicture, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+        }
+    }
+
+    /*public static String getName() {
+        return name;
+    }
+
+    public static void setName(String name) {
+        ProfileFragment.name = name;
+    }
+
+    public static String getProfilePictureUrl() {
+        return profile_picture_url;
+    }
+
+    public static void setProfilePictureUrl(String profile_picture_url) {
+        ProfileFragment.profile_picture_url = profile_picture_url;
+    }*/
+
+
 }

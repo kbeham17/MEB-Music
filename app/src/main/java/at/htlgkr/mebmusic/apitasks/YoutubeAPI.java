@@ -2,15 +2,15 @@ package at.htlgkr.mebmusic.apitasks;
 
 import at.htlgkr.mebmusic.models.ModelPlaylist;
 import at.htlgkr.mebmusic.playlist.Playlist;
-import retrofit2.Call;
+/*import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Url;
+import retrofit2.http.Url;*/
 
 public class YoutubeAPI {
     public static final String BASE = "https://www.googleapis.com/youtube/v3/";
-    public static final String KEY = "&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg";
+    public static final String KEY = "&key=AIzaSyB6AupkZ2-GIGeNas6m7pGYwH5nYpcHJ4o";
     public static final String PLAYLIST = "playlists?";
     public static final String PART_PLAYLIST = "&part=snippet,contentDetails";
     public static final String CHANNELID = "&channelId=UCMnR3J-chev22dTqJEquFcg";
@@ -23,7 +23,7 @@ public class YoutubeAPI {
 
 
 
-    public interface PlaylistVideo{
+    /*public interface PlaylistVideo{
         @GET
         Call<ModelPlaylist> getYT(@Url String url);
     }
@@ -39,5 +39,5 @@ public class YoutubeAPI {
             playlistVideo = retrofit.create(PlaylistVideo.class);
         }
         return playlistVideo;
-    }
+    }*/
 }
