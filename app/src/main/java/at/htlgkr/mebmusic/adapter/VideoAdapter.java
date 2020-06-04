@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +16,6 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import at.htlgkr.mebmusic.R;
-import at.htlgkr.mebmusic.playlist.Playlist;
 import at.htlgkr.mebmusic.videos.Video;
 
 public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

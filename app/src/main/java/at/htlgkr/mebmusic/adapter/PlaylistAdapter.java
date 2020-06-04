@@ -4,15 +4,12 @@ import android.content.Context;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Callback;
@@ -43,10 +40,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public YoutubeHolder(View itemView){
             super(itemView);
-            playlistThumbail = itemView.findViewById(R.id.iv_video_thumb);
-            title = itemView.findViewById(R.id.text_video_title);
-            description = itemView.findViewById(R.id.text_video_description);
-            video_count = itemView.findViewById(R.id.text_video_count);
+            playlistThumbail = itemView.findViewById(R.id.iv_playlist_thumb);
+            title = itemView.findViewById(R.id.text_playlist_title);
+            description = itemView.findViewById(R.id.text_playlist_description);
+            video_count = itemView.findViewById(R.id.text_playlist_count);
 
             itemView.setOnCreateContextMenuListener(this);
         }
