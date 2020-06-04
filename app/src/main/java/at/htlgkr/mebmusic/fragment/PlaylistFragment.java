@@ -3,14 +3,20 @@ package at.htlgkr.mebmusic.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.google.gson.JsonObject;
 
@@ -44,32 +50,80 @@ public class PlaylistFragment extends Fragment {
     private PlaylistAdapter adapter;
     private LinearLayoutManager manager;
     private List<Playlist> playlistList = new ArrayList<>();
-    private RecyclerView rv;
+    private String CHANNELID;
+
+    public PlaylistFragment(String channelId) {
+        this.CHANNELID = channelId;
+    }
 
     public PlaylistFragment() {
-        // Required empty public constructor
     }
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_playlist, container,false);
-        // Inflate the layout for this fragment
-        rv = view.findViewById(R.id.recycler_playlist);
+        View view = inflater.inflate(R.layout.fragment_playlist, container, false);
+
+        RecyclerView rv = view.findViewById(R.id.recycler_playlist);
         adapter = new PlaylistAdapter(getContext(), playlistList);
         manager = new LinearLayoutManager(getContext());
         rv.setAdapter(adapter);
         rv.setLayoutManager(manager);
 
-        if(playlistList.size() == 0 ){
-            getJson();
-        }
+        playlistList.clear();
+        getJson();
+
         rv.setHasFixedSize(true);
+
+        registerForContextMenu(rv);
+
         return view;
     }
 
-    private void getJson(){
-        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST + YoutubeAPI.CHANNELID + YoutubeAPI.KEY ;
+    /*@Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
+        int viewId = v.getId();
+        if (viewId == R.id.recycler_playlist) {
+            getActivity().getMenuInflater().inflate(R.menu.context_menu_playlist, menu);
+        }
+
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }*/
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        //AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        //int entryID = info.position;
+
+        int entryID = -1;
+
+        try{
+            entryID = adapter.getPosition();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        if(item.getItemId() == R.id.context_playlist_bearbeiten){
+            return true;
+        }
+        if(item.getItemId() == R.id.context_playlist_details){
+            Playlist playlist = playlistList.get(entryID);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+            dialog.setMessage("Title: " + playlist.getSnippet().getTitle().toString() + "\nDescription: " + playlist.getSnippet().getDescription() + "\nVideo Count: " + playlist.getPlaylistDetails().getItemCount());
+            dialog.setNeutralButton("OK", null);
+            dialog.show();
+
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    private void getJson() {
+        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST + YoutubeAPI.CHANNELID + CHANNELID + YoutubeAPI.KEY;
         GETTask getTask = new GETTask(url);
         getTask.execute();
 
@@ -80,31 +134,29 @@ public class PlaylistFragment extends Fragment {
         }
 
         String toDoJson = getTask.getJsonResponse();
-        if(toDoJson != null) {
+        if (toDoJson != null) {
             try {
-                String split = toDoJson.split("\"items\": " )[1];
+                String split = toDoJson.split("\"items\": ")[1];
                 //String[] itemsSplit = split.split("},");
                 JSONArray jsonarr = new JSONArray(split);
 
-                for(int i = 0; i< jsonarr.length(); i++){
+                for (int i = 0; i < jsonarr.length(); i++) {
                     JSONObject base = jsonarr.getJSONObject(i);
                     String id = base.get("id").toString();
                     JSONObject snippetObject = (JSONObject) base.get("snippet");
                     JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
                     JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
-                    PlaylistSnippet snippet = new PlaylistSnippet(snippetObject.get("title").toString(), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
+                    PlaylistSnippet snippet = new PlaylistSnippet(snippetObject.get("title").toString(), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())), snippetObject.getString("description"));
                     JSONObject detailsObject = (JSONObject) base.get("contentDetails");
-                    PlaylistDetails playlistDetails = new PlaylistDetails((int) detailsObject.get("itemCount")) ;
+                    PlaylistDetails playlistDetails = new PlaylistDetails((int) detailsObject.get("itemCount"));
 
                     playlistList.add(new Playlist(id, snippet, playlistDetails));
                 }
-            }catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
         }
-        adapter = new PlaylistAdapter(getContext(), playlistList);
-        rv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
 //        Call<ModelPlaylist> data = YoutubeAPI.getPlaylistVideo().getYT("https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg");
