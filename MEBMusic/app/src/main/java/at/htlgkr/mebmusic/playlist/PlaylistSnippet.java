@@ -4,14 +4,16 @@ import at.htlgkr.mebmusic.Thumbnail;
 
 public class PlaylistSnippet {
     private String title;
+    private String description;
     private Thumbnail thumbnail;
 
     public PlaylistSnippet() {
     }
 
-    public PlaylistSnippet(String title, Thumbnail thumbnail ){
+    public PlaylistSnippet(String title, Thumbnail thumbnail, String description){
         this.title = title;
-        this.thumbnail=thumbnail;
+        this.thumbnail = thumbnail;
+        this.description = description;
     }
 
     public String getTitle() {
@@ -28,5 +30,13 @@ public class PlaylistSnippet {
 
     public void setThumbnail(Thumbnail thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

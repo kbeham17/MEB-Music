@@ -9,7 +9,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/iv_playlist_thumb"
+        android:id="@+id/iv_video_thumb"
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
@@ -19,7 +19,7 @@
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <TextView
-        android:id="@+id/text_playlist_title"
+        android:id="@+id/text_video_title"
         android:layout_width="0dp"
         android:layout_height="29dp"
         android:layout_marginLeft="15dp"
@@ -29,10 +29,10 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_playlist_thumb" />
+        app:layout_constraintTop_toBottomOf="@+id/iv_video_thumb" />
 
     <TextView
-        android:id="@+id/text_playlist_description"
+        android:id="@+id/text_video_date"
         android:layout_width="0dp"
         android:layout_height="35dp"
         android:layout_marginLeft="15dp"
@@ -44,7 +44,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_playlist_title"
+        app:layout_constraintTop_toBottomOf="@+id/text_video_title"
         app:layout_constraintVertical_bias="0.0" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -54,32 +54,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_begin="279dp" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_playlist_thumb"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@color/common_google_signin_btn_text_light_pressed" />
-
-    <TextView
-        android:id="@+id/text_playlist_count"
-        android:layout_width="0dp"
-        android:layout_height="29dp"
-        android:fontFamily="@font/light"
-        android:text="Hallo"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
-        app:layout_constraintEnd_toEndOf="@+id/iv_playlist_thumb"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
-
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
@@ -88,5 +62,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_playlist_description" />
+        app:layout_constraintTop_toBottomOf="@+id/text_video_date" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="orderBy">
+    <item name="searchSortUnspecified">searchSortUnspecified</item>
+    <item name="date">date</item>
+    <item name="rating">rating</item>
+    <item name="viewCount">viewCount</item>
+    <item name="relevance">relevance</item>
+    <item name="title">title</item>
+    <item name="videoCount">videoCount</item>
+    </string-array>
+</resources>
