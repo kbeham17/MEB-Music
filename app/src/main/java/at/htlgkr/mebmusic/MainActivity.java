@@ -32,24 +32,22 @@ import at.htlgkr.mebmusic.fragment.SearchFragment;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
     private static final int RQ_RESULT_START_ACTIVITY = 1;
+
     private static String profile_picture_url;
     private static String name;
     private static String email;
     private static String id;
 
-
     private PlaylistFragment playlistFragment = new PlaylistFragment("");
     private ProfileFragment profileFragment = new ProfileFragment(null, null);
     private SearchFragment searchFragment = new SearchFragment();
-    private BottomNavigationView menuBottomNavigationView;
-
 
     private SharedPreferences prefs;
-
 
     public static GoogleApiClient googleApiClient;
     private GoogleSignInOptions gso;
 
+    private BottomNavigationView menuBottomNavigationView;
     private Button buttonLogout;
 
     @Override
@@ -58,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         setContentView(R.layout.activity_main);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
 
         gotoStartActivity();
 
@@ -73,9 +70,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         menuBottomNavigationView = findViewById(R.id.menu_bottomNavigationView);
 
-
-
-
         menuBottomNavigationView.setSelectedItemId(R.id.menu_profile);
         menuBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -85,24 +79,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 } else {
                     switch (menuItem.getItemId()) {
                         case R.id.menu_profile:
+
                             profileFragment = new ProfileFragment(name, profile_picture_url);
                             setFragment(profileFragment);
-
                             return true;
+
                         case R.id.menu_playlist:
+
                             String channelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
+
                             if (channelId.equals("")){
                                 channelId = "UCMnR3J-chev22dTqJEquFcg";
                             }
+
                             playlistFragment = new PlaylistFragment(channelId);
                             setFragment(playlistFragment);
                             return true;
+
                         case R.id.menu_search:
+
                             String order = prefs.getString("list_preference_order", "relevance");
                             searchFragment = new SearchFragment(order);
                             setFragment(searchFragment);
                             return true;
+
                         case R.id.menu_logout:
+
                             Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
                                 @Override
                                 public void onResult(@NonNull Status status) {
@@ -113,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     }
                                 }
                             });
-
                             return true;
+
                         default:
                             profileFragment = new ProfileFragment(name, profile_picture_url);
                             setFragment(profileFragment);
@@ -132,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private void gotoStartActivity() {
         Intent intent = new Intent(this, StartActivity.class);
         startActivityForResult(intent, RQ_RESULT_START_ACTIVITY);
+
     }
 
     @Override
