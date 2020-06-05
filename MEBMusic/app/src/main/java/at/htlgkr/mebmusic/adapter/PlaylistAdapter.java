@@ -33,7 +33,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
-
     class YoutubeHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
         ImageView playlistThumbail;
         TextView title, description, video_count;

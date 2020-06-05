@@ -16,7 +16,6 @@ public class PUTTask extends AsyncTask<String, Integer, String> {
         this.URL=URL;
     }
 
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
