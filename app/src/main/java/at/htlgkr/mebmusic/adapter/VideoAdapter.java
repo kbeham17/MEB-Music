@@ -22,6 +22,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private Context context;
     private List<Video> videoList;
+    private int position;
 
     public VideoAdapter(Context context, List<Video> videoList) {
         this.context = context;
@@ -86,6 +87,10 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemCount() {
         return videoList.size();
+    }
+
+    public int getPosition() {
+        return position;
     }
 
 

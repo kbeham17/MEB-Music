@@ -2,17 +2,26 @@ package at.htlgkr.mebmusic.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.LightingColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +35,10 @@ import at.htlgkr.mebmusic.actvities.PreferenceActivity;
 import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
 import at.htlgkr.mebmusic.adapter.VideoAdapter;
 import at.htlgkr.mebmusic.apitasks.GETTask;
+import at.htlgkr.mebmusic.apitasks.PUTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
+import at.htlgkr.mebmusic.playlist.Playlist;
+import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.videos.Video;
@@ -47,9 +59,7 @@ public class PlaylistVideoFragment extends Fragment {
     private List<Video> videoList = new ArrayList<>();
     Bundle extra;
 
-    public PlaylistVideoFragment() {
-
-    }
+    public PlaylistVideoFragment() {}
 
     public PlaylistVideoFragment(String id){
         this.id = id;
@@ -68,11 +78,92 @@ public class PlaylistVideoFragment extends Fragment {
         rv.setAdapter(adapter);
         rv.setLayoutManager(manager);
 
+        registerForContextMenu(rv);
+
         videoList.clear();
 
+        intializeView(view);
         getJson();
 
         return view;
+    }
+
+   /* @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+
+        int viewId = v.getId();
+        if (viewId == R.id.recycler_playlistvideos){
+            getMenuInflater().inflate(R.menu.context_menu_playlistvideos, menu)
+        }
+
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }*/
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        int entryID = -1;
+
+        try{
+                entryID = adapter.getPosition();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        if(item.getItemId() == R.id.context_playlistvideos_rate){
+
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            final int finalEntryID = entryID;
+
+            final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlist_edit, null);
+
+            new AlertDialog.Builder(getContext())
+                    .setCancelable(false)
+                    .setView(vDialog)
+                    .setPositiveButton("Like", ((dialog, which) -> handleDialogLike(vDialog, finalEntryID)))
+                    .setNeutralButton("Dislike", ((dialog, which) -> handleDialogDislike(vDialog, finalEntryID)))
+                    .setNegativeButton("Cancel", null)
+                    .show()
+                    .getWindow()
+                    .getDecorView()
+                    .getBackground()
+                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
+            return true;
+        }
+        if(item.getItemId() == R.id.context_playlistvideos_comment){
+
+            final int finalEntryID = entryID;
+
+            final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlistvideos_comment, null);
+
+            setUpDialogComment(vDialog, finalEntryID);
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    private void setUpDialogComment(View vDialog, int entryID){
+        EditText editComment = vDialog.findViewById(R.id.dialog_playlistvideos_comment);
+        String comment = editComment.getText().toString();
+    }
+
+    private void intializeView(View view){
+        RecyclerView rv = view.findViewById(R.id.recycler_playlistvideos);
+
+
+    }
+
+    private void handleDialogLike(View vDialog, int entryID){
+
+    }
+
+    private void handleDialogDislike(View vDialog, int entryID){
+
     }
 
     private void setUpBackButton(View view){
@@ -85,8 +176,6 @@ public class PlaylistVideoFragment extends Fragment {
         });
     }
 
-
-
     public void setId(String id) {
         this.id = id;
     }
@@ -94,10 +183,6 @@ public class PlaylistVideoFragment extends Fragment {
     public void setMAct(MainActivity mAct){
         this.mAct = mAct;
     }
-
-    /*public void setBackFragmentPlaylist(PlaylistFragment fragment){
-        this.backFragmentPlaylist = fragment;
-    }*/
 
     private void getJson() {
 
