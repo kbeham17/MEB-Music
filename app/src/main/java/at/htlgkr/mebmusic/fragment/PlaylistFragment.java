@@ -89,7 +89,7 @@ public class PlaylistFragment extends Fragment{
                 Playlist playlist = playlistList.get(position);
                 String id = playlist.getId();
 
-                PlaylistVideoFragment fragment = new PlaylistVideoFragment();
+                PlaylistVideoFragment fragment = new PlaylistVideoFragment(id);
                 fragment.setMAct(mAct);
 
                 mAct.setFragment(fragment);
