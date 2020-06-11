@@ -6,4 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".actvities.PlaylistVideosActivity">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_videos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

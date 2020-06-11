@@ -3,6 +3,7 @@ package at.htlgkr.mebmusic.actvities;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +39,17 @@ public class PlaylistVideosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist_videos);
 
+        RecyclerView rv = view.findViewById(R.id.recycler_playlist);
+        adapter = new PlaylistAdapter(getContext(), videoList);
+        manager = new LinearLayoutManager(getContext());
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(manager);
+
+        videoList.clear();
+
         extra = getIntent().getExtras();
+        getJson();
+
     }
 
     @Override
