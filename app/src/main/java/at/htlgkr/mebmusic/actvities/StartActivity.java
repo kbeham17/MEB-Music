@@ -1,4 +1,4 @@
-package at.htlgkr.mebmusic;
+package at.htlgkr.mebmusic.actvities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import at.htlgkr.mebmusic.R;
 
 public class StartActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 

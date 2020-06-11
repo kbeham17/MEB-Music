@@ -1,4 +1,4 @@
-package at.htlgkr.mebmusic;
+package at.htlgkr.mebmusic.actvities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,7 +25,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
+import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private PlaylistFragment playlistFragment = new PlaylistFragment("");
     private ProfileFragment profileFragment = new ProfileFragment(null, null);
     private SearchFragment searchFragment = new SearchFragment();
+
+    private FragmentTransaction ft;
 
     private SharedPreferences prefs;
 
@@ -71,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         menuBottomNavigationView = findViewById(R.id.menu_bottomNavigationView);
 
         menuBottomNavigationView.setSelectedItemId(R.id.menu_profile);
+
+        MainActivity mAct = this;
+
         menuBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -93,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             }
 
                             playlistFragment = new PlaylistFragment(channelId);
+                            playlistFragment.setMAct(mAct);
                             setFragment(playlistFragment);
                             return true;
 
@@ -182,9 +189,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    private void setFragment(Fragment fragment){
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    public void setFragment(Fragment fragment){
+        ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_main, fragment);
         ft.commit();
     }
+
+    public void setPlaylistFragment(){
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.frame_main, playlistFragment);
+        ft.commit();
+    }
+
+
 }

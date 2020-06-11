@@ -120,9 +120,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         });
 
-
-
-
     }
 
     public interface OnPlaylistClickListener{

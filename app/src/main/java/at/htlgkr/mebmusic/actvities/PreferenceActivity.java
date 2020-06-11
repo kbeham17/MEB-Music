@@ -1,4 +1,4 @@
-package at.htlgkr.mebmusic;
+package at.htlgkr.mebmusic.actvities;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;

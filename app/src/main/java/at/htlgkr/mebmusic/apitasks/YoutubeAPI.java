@@ -11,25 +11,25 @@ import retrofit2.http.Url;*/
 public class YoutubeAPI {
     public static final String BASE = "https://www.googleapis.com/youtube/v3/";
     public static final String KEY = "&key=AIzaSyB6AupkZ2-GIGeNas6m7pGYwH5nYpcHJ4o";
-    //Vasi API KEY: AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg
+    //Vasi API KEY: AIzaSyBB0Pz6WoNaYZzY4lueiwVgNMXutLBueg4
     //Stefan API KEY: AIzaSyA6c0fMsjJOMwZcsKxGt9JVh8pPiz13rPw
     //Kevin API KEY: AIzaSyB6AupkZ2-GIGeNas6m7pGYwH5nYpcHJ4o
 
     public static final String PLAYLIST = "playlists?";
-    //Vasi API Key
-    //Kevin API Key
-    //Stefan API Key
     public static final String PART_PLAYLIST = "&part=snippet,contentDetails";
     public static final String CHANNELID = "&channelId=";
     //https://www.googleapis.com/youtube/v3/playlists?key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg&part=snippet,contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg
 
     public static final String SEARCH = "search?";
-    public static final String MAX = "&maxResults=10";
+    public static final String MAX = "10";
     public static final String ORDER = "&order=";
     public static final String PART = "&part=snippet";
 
     public static final String QUERY = "&q=";
     public static final String TYPE = "&type=video";
+
+    public static final String PLAYLISTITEMS = "playlistItems?";
+    public static final String PLAYLISTID = "&playlistId=";
 
 }
 

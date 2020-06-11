@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,9 +26,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.htlgkr.mebmusic.MediumThumb;
-import at.htlgkr.mebmusic.PlaylistVideosActivity;
-import at.htlgkr.mebmusic.Thumbnail;
+import at.htlgkr.mebmusic.actvities.MainActivity;
+import at.htlgkr.mebmusic.thumbnail.MediumThumb;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.PUTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
@@ -49,7 +50,7 @@ public class PlaylistFragment extends Fragment{
     private LinearLayoutManager manager;
     private List<Playlist> playlistList = new ArrayList<>();
     private String CHANNELID;
-
+    private MainActivity mAct;
     private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
 
     public PlaylistFragment(String channelId) {
@@ -59,7 +60,9 @@ public class PlaylistFragment extends Fragment{
     public PlaylistFragment() {
     }
 
-
+    public void setMAct(MainActivity mAct){
+        this.mAct = mAct;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,14 +88,18 @@ public class PlaylistFragment extends Fragment{
             public void onPlaylistClick(int position) {
                 Playlist playlist = playlistList.get(position);
                 String id = playlist.getId();
-                Intent intent = new Intent(ctx, PlaylistVideosActivity.class);
-                intent.putExtra("id", id);
-                startActivityForResult(intent, RQ_PLAYLISTVIDEO_ACTIVITY);
+
+                PlaylistVideoFragment fragment = new PlaylistVideoFragment();
+                fragment.setMAct(mAct);
+
+                mAct.setFragment(fragment);
             }
         });
 
         return view;
     }
+
+
 
     /*@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -246,6 +253,15 @@ public class PlaylistFragment extends Fragment{
 
         }
         adapter.notifyDataSetChanged();
+    }
+
+
+
+}
+
+
+
+
 
 //        Call<ModelPlaylist> data = YoutubeAPI.getPlaylistVideo().getYT("https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg");
 //        data.enqueue(new Callback<ModelPlaylist>() {
@@ -267,9 +283,4 @@ public class PlaylistFragment extends Fragment{
 //                Log.e(TAG, "onFailure playlist: ", t);
 //            }
 //        });
-    }
-
-
-}
-
 //"https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg"
