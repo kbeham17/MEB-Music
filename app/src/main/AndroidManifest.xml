@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".actvities.PlaylistVideosActivity"/>
         <activity android:name=".actvities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,7 @@
         </activity>
         <activity android:name=".actvities.StartActivity" />
         <activity android:name=".actvities.ProfileActivity" />
-        <activity android:name=".actvities.PreferenceActivity"></activity>
+        <activity android:name=".actvities.PreferenceActivity" />
     </application>
 
 </manifest>

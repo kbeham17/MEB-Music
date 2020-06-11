@@ -21,14 +21,15 @@ public class YoutubeAPI {
     //https://www.googleapis.com/youtube/v3/playlists?key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg&part=snippet,contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg
 
     public static final String SEARCH = "search?";
-    public static final String MAX = "&maxResults=10";
+    public static final String MAX = "10";
     public static final String ORDER = "&order=";
     public static final String PART = "&part=snippet";
 
     public static final String QUERY = "&q=";
     public static final String TYPE = "&type=video";
 
-    public static final String PLAYLISTITEMS = "playlistItems?playlistItems?";
+    public static final String PLAYLISTITEMS = "playlistItems?";
+    public static final String PLAYLISTID = "&playlistId=";
 
 }
 
