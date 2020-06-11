@@ -31,6 +31,9 @@ public class YoutubeAPI {
     public static final String PLAYLISTITEMS = "playlistItems?";
     public static final String PLAYLISTID = "&playlistId=";
 
+    public static final String RATE = "videos/rate?";
+    public static final String RATING = "&rating=";
+    public static final String ID = "id=";
 }
 
     /*public interface PlaylistVideo{

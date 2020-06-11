@@ -1,19 +1,14 @@
 package at.htlgkr.mebmusic.fragment;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.LightingColorFilter;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,14 +26,12 @@ import java.util.List;
 
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.actvities.MainActivity;
-import at.htlgkr.mebmusic.actvities.PreferenceActivity;
-import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
 import at.htlgkr.mebmusic.adapter.VideoAdapter;
+import at.htlgkr.mebmusic.apitasks.DELETETask;
 import at.htlgkr.mebmusic.apitasks.GETTask;
-import at.htlgkr.mebmusic.apitasks.PUTTask;
+import at.htlgkr.mebmusic.apitasks.POSTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
 import at.htlgkr.mebmusic.playlist.Playlist;
-import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.videos.Video;
@@ -101,26 +94,25 @@ public class PlaylistVideoFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-
         int entryID = -1;
 
         try{
-                entryID = adapter.getPosition();
+            entryID = adapter.getPosition();
         } catch (Exception ex){
             ex.printStackTrace();
         }
 
-        if(item.getItemId() == R.id.context_playlistvideos_rate){
-
+        if(item.getItemId() == R.id.context_playlistvideos_details){
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
             final int finalEntryID = entryID;
+            Video video = videoList.get(entryID);
 
             final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlist_edit, null);
 
             new AlertDialog.Builder(getContext())
                     .setCancelable(false)
                     .setView(vDialog)
+                    .setMessage("Title: " + video.getSnippet().getTitle().toString() + "\nDescription: " + video.getSnippet().getDescription() + "\nPublished At: " + video.getSnippet().getPublishedAt())
                     .setPositiveButton("Like", ((dialog, which) -> handleDialogLike(vDialog, finalEntryID)))
                     .setNeutralButton("Dislike", ((dialog, which) -> handleDialogDislike(vDialog, finalEntryID)))
                     .setNegativeButton("Cancel", null)
@@ -137,33 +129,89 @@ public class PlaylistVideoFragment extends Fragment {
 
             final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlistvideos_comment, null);
 
-            setUpDialogComment(vDialog, finalEntryID);
+            handleDialogComment(vDialog, finalEntryID);
 
-            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+            new AlertDialog.Builder(getContext())
+                    .setCancelable(false)
+                    .setView(vDialog)
+                    .setPositiveButton("Send", ((dialog, which) -> handleDialogComment(vDialog, finalEntryID)))
+                    .setNegativeButton("Cancel", null)
+                    .show()
+                    .getWindow()
+                    .getDecorView()
+                    .getBackground()
+                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));;
 
             return true;
         }
+        if(item.getItemId() == R.id.context_playlistvideos_delete){
+            //NED AUSPROBIERN WEIL SONST GIBTS BOOM
+
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            final int finalEntryID = entryID;
+
+            Video video = videoList.get(entryID);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+            String url = YoutubeAPI.BASE + YoutubeAPI.ID + video.getVideoID() + YoutubeAPI.KEY;
+
+            DELETETask delTask = new DELETETask(url);
+            delTask.execute();
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            String name = videoList.get(entryID).getSnippet().getTitle();
+
+            videoList.remove(entryID);
+            adapter.notifyDataSetChanged();
+
+            Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
+        }
+
 
         return super.onContextItemSelected(item);
     }
 
-    private void setUpDialogComment(View vDialog, int entryID){
+    private void handleDialogComment(View vDialog, int entryID){
         EditText editComment = vDialog.findViewById(R.id.dialog_playlistvideos_comment);
         String comment = editComment.getText().toString();
+
+
+
     }
 
     private void intializeView(View view){
         RecyclerView rv = view.findViewById(R.id.recycler_playlistvideos);
-
-
     }
 
     private void handleDialogLike(View vDialog, int entryID){
+        String like = "like";
+        String url = YoutubeAPI.BASE + YoutubeAPI.RATE + YoutubeAPI.ID + videoList.get(entryID).getVideoID() + YoutubeAPI.RATING + like + YoutubeAPI.KEY;
+        POSTTask postTask = new POSTTask(url);
+        postTask.execute();
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleDialogDislike(View vDialog, int entryID){
+        String dislike = "dislike";
+        String url = YoutubeAPI.BASE + YoutubeAPI.RATE + YoutubeAPI.ID + videoList.get(entryID).getVideoID() + YoutubeAPI.RATING + dislike + YoutubeAPI.KEY;
+        POSTTask postTask = new POSTTask(url);
+        postTask.execute();
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setUpBackButton(View view){
@@ -185,7 +233,6 @@ public class PlaylistVideoFragment extends Fragment {
     }
 
     private void getJson() {
-
         String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLISTITEMS + YoutubeAPI.PART + YoutubeAPI.PLAYLISTID + id + YoutubeAPI.KEY;
         GETTask getTask = new GETTask(url);
         getTask.execute();
