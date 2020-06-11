@@ -65,6 +65,7 @@ public class PlaylistFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
 
+
         RecyclerView rv = view.findViewById(R.id.recycler_playlist);
         adapter = new PlaylistAdapter(getContext(), playlistList);
         manager = new LinearLayoutManager(getContext());
