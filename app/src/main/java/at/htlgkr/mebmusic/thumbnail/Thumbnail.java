@@ -1,4 +1,4 @@
-package at.htlgkr.mebmusic;
+package at.htlgkr.mebmusic.thumbnail;
 
 public class Thumbnail {
 

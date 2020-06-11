@@ -1,6 +1,6 @@
 package at.htlgkr.mebmusic.playlist;
 
-import at.htlgkr.mebmusic.Thumbnail;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 
 public class PlaylistSnippet {
     private String title;

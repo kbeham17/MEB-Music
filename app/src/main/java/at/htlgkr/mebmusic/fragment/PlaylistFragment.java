@@ -5,37 +5,29 @@ import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.htlgkr.mebmusic.MediumThumb;
-import at.htlgkr.mebmusic.Thumbnail;
+import at.htlgkr.mebmusic.thumbnail.MediumThumb;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.PUTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
-import at.htlgkr.mebmusic.models.ModelPlaylist;
 import at.htlgkr.mebmusic.playlist.Playlist;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
@@ -44,8 +36,6 @@ import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
 /*import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;*/
-
-import static androidx.constraintlayout.widget.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -146,7 +136,7 @@ public class PlaylistFragment extends Fragment {
     }
 
     private void getJson() {
-        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST +  YoutubeAPI.CHANNELID + CHANNELID ;
+        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST +  YoutubeAPI.CHANNELID + CHANNELID + YoutubeAPI.KEY;
         GETTask getTask = new GETTask(url);
         getTask.execute();
 

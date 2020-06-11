@@ -1,8 +1,10 @@
-package at.htlgkr.mebmusic;
+package at.htlgkr.mebmusic.actvities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import at.htlgkr.mebmusic.R;
 
 public class ProfileActivity extends AppCompatActivity {
 

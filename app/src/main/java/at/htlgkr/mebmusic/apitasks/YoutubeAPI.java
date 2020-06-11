@@ -28,6 +28,8 @@ public class YoutubeAPI {
     public static final String QUERY = "&q=";
     public static final String TYPE = "&type=video";
 
+    public static final String PLAYLISTITEMS = "playlistItems?playlistItems?";
+
 }
 
     /*public interface PlaylistVideo{

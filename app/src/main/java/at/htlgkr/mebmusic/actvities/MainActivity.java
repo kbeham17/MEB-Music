@@ -1,4 +1,4 @@
-package at.htlgkr.mebmusic;
+package at.htlgkr.mebmusic.actvities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +24,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
+import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;

@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import at.htlgkr.mebmusic.PreferenceActivity;
+import at.htlgkr.mebmusic.actvities.PreferenceActivity;
 import at.htlgkr.mebmusic.R;
 
 /**
