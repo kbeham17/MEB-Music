@@ -1,27 +1,23 @@
 package at.htlgkr.mebmusic.fragment;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,11 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.htlgkr.mebmusic.MediumThumb;
+import at.htlgkr.mebmusic.PlaylistVideosActivity;
 import at.htlgkr.mebmusic.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.PUTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
-import at.htlgkr.mebmusic.models.ModelPlaylist;
 import at.htlgkr.mebmusic.playlist.Playlist;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
@@ -44,17 +40,17 @@ import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
 import retrofit2.Callback;
 import retrofit2.Response;*/
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PlaylistFragment extends Fragment {
+public class PlaylistFragment extends Fragment{
 
     private PlaylistAdapter adapter;
     private LinearLayoutManager manager;
     private List<Playlist> playlistList = new ArrayList<>();
     private String CHANNELID;
+
+    private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
 
     public PlaylistFragment(String channelId) {
         this.CHANNELID = channelId;
@@ -81,6 +77,19 @@ public class PlaylistFragment extends Fragment {
         rv.setHasFixedSize(true);
 
         registerForContextMenu(rv);
+
+        Context ctx = this.getContext();
+
+        adapter.setOnPlaylistClickListener(new PlaylistAdapter.OnPlaylistClickListener() {
+            @Override
+            public void onPlaylistClick(int position) {
+                Playlist playlist = playlistList.get(position);
+                String id = playlist.getId();
+                Intent intent = new Intent(ctx, PlaylistVideosActivity.class);
+                intent.putExtra("id", id);
+                startActivityForResult(intent, RQ_PLAYLISTVIDEO_ACTIVITY);
+            }
+        });
 
         return view;
     }
@@ -259,6 +268,8 @@ public class PlaylistFragment extends Fragment {
 //            }
 //        });
     }
+
+
 }
 
 //"https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg"
