@@ -26,6 +26,7 @@ import java.util.List;
 
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.actvities.MainActivity;
+import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
 import at.htlgkr.mebmusic.adapter.VideoAdapter;
 import at.htlgkr.mebmusic.apitasks.DELETETask;
 import at.htlgkr.mebmusic.apitasks.GETTask;
@@ -78,6 +79,14 @@ public class PlaylistVideoFragment extends Fragment {
         intializeView(view);
         getJson();
 
+
+        adapter.setOnVideoClickListener(new VideoAdapter.OnVideoClickListener() {
+            @Override
+            public void onVideoClick(int position) {
+
+            }
+        });
+
         return view;
     }
 
@@ -98,6 +107,7 @@ public class PlaylistVideoFragment extends Fragment {
 
         try{
             entryID = adapter.getPosition();
+//            entryID = item.getItemId();
         } catch (Exception ex){
             ex.printStackTrace();
         }
@@ -107,20 +117,30 @@ public class PlaylistVideoFragment extends Fragment {
             final int finalEntryID = entryID;
             Video video = videoList.get(entryID);
 
-            final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlist_edit, null);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+            dialog.setMessage("Title: " + video.getSnippet().getTitle().toString() + "\nDescription: " + video.getSnippet().getDescription() + "\nPublished At: " + video.getSnippet().getPublishedAt());
+            dialog.setPositiveButton("Like", ((vDialog, which) -> handleDialogLike(finalEntryID)));
+                    dialog.setNegativeButton("Dislike", ((vDialog, which) -> handleDialogDislike(finalEntryID)));
+                    dialog.setNeutralButton("Cancel", null);
+            dialog.show().getWindow().getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
+
+
+   /*         final View vDialog = getLayoutInflater().inflate(R.layout.dialog_, null);
 
             new AlertDialog.Builder(getContext())
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .setView(vDialog)
                     .setMessage("Title: " + video.getSnippet().getTitle().toString() + "\nDescription: " + video.getSnippet().getDescription() + "\nPublished At: " + video.getSnippet().getPublishedAt())
                     .setPositiveButton("Like", ((dialog, which) -> handleDialogLike(vDialog, finalEntryID)))
-                    .setNeutralButton("Dislike", ((dialog, which) -> handleDialogDislike(vDialog, finalEntryID)))
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Dislike", ((dialog, which) -> handleDialogDislike(vDialog, finalEntryID)))
+                    .setNeutralButton("Cancel", null)
                     .show()
                     .getWindow()
                     .getDecorView()
                     .getBackground()
-                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
+                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));*/
+
             return true;
         }
         if(item.getItemId() == R.id.context_playlistvideos_comment){
@@ -188,7 +208,7 @@ public class PlaylistVideoFragment extends Fragment {
         RecyclerView rv = view.findViewById(R.id.recycler_playlistvideos);
     }
 
-    private void handleDialogLike(View vDialog, int entryID){
+    private void handleDialogLike(int entryID){
         String like = "like";
         String url = YoutubeAPI.BASE + YoutubeAPI.RATE + YoutubeAPI.ID + videoList.get(entryID).getVideoID() + YoutubeAPI.RATING + like + YoutubeAPI.KEY;
         POSTTask postTask = new POSTTask(url);
@@ -201,7 +221,7 @@ public class PlaylistVideoFragment extends Fragment {
         }
     }
 
-    private void handleDialogDislike(View vDialog, int entryID){
+    private void handleDialogDislike(int entryID){
         String dislike = "dislike";
         String url = YoutubeAPI.BASE + YoutubeAPI.RATE + YoutubeAPI.ID + videoList.get(entryID).getVideoID() + YoutubeAPI.RATING + dislike + YoutubeAPI.KEY;
         POSTTask postTask = new POSTTask(url);
@@ -252,11 +272,13 @@ public class PlaylistVideoFragment extends Fragment {
 
                 for (int i = 0; i < jsonarr.length(); i++) {
                     JSONObject base = jsonarr.getJSONObject(i);
-                    String id = base.get("id").toString();
                     JSONObject snippetObject = (JSONObject) base.get("snippet");
+                    JSONObject resourceIdObject = (JSONObject) snippetObject.get("resourceId");
+                    String id = resourceIdObject.get("videoId").toString();
                     JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
                     JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
                     VideoSnippet snippet = new VideoSnippet(snippetObject.getString("publishedAt"), snippetObject.get("title").toString(),snippetObject.getString("description"), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
+
 
                     videoList.add(new Video(id, snippet));
                 }

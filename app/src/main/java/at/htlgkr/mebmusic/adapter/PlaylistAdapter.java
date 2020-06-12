@@ -67,6 +67,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(Menu.NONE, R.id.context_playlist_details, Menu.NONE, "Details");
             menu.add(Menu.NONE, R.id.context_playlist_bearbeiten, Menu.NONE, "Edit");
+            menu.add(Menu.NONE, R.id.context_playlist_delete, Menu.NONE, "Delete");
         }
 
 
