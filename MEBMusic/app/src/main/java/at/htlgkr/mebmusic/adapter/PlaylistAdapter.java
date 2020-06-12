@@ -21,24 +21,27 @@ import java.util.List;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.playlist.Playlist;
 
-public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private List<Playlist> playlists;
     private int position;
+    private OnPlaylistClickListener mListener;
 
     public PlaylistAdapter(Context context, List<Playlist> playlists){
         this.context = context;
         this.playlists = playlists;
     }
 
-
+    public void setOnPlaylistClickListener(OnPlaylistClickListener listener){
+        mListener = listener;
+    }
 
     class YoutubeHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
         ImageView playlistThumbail;
         TextView title, description, video_count;
 
-        public YoutubeHolder(View itemView){
+        public YoutubeHolder(View itemView, OnPlaylistClickListener listener){
             super(itemView);
             playlistThumbail = itemView.findViewById(R.id.iv_playlist_thumb);
             title = itemView.findViewById(R.id.text_playlist_title);
@@ -46,12 +49,25 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             video_count = itemView.findViewById(R.id.text_playlist_count);
 
             itemView.setOnCreateContextMenuListener(this);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            listener.onPlaylistClick(position);
+                        }
+                    }
+                }
+            });
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(Menu.NONE, R.id.context_playlist_details, Menu.NONE, "Details");
             menu.add(Menu.NONE, R.id.context_playlist_bearbeiten, Menu.NONE, "Edit");
+            menu.add(Menu.NONE, R.id.context_playlist_delete, Menu.NONE, "Delete");
         }
 
 
@@ -88,7 +104,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater infalter = LayoutInflater.from(context);
         View view = infalter.inflate(R.layout.row_item_playlist, parent, false);
-        return new YoutubeHolder(view);
+        return new YoutubeHolder(view, mListener);
     }
 
     @Override
@@ -104,6 +120,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return false;
             }
         });
+
+    }
+
+    public interface OnPlaylistClickListener{
+        void onPlaylistClick(int position);
     }
 
     @Override

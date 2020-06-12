@@ -1,6 +1,6 @@
 package at.htlgkr.mebmusic.videos;
 
-import at.htlgkr.mebmusic.Thumbnail;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 
 public class VideoSnippet {
     private String publishedAt;

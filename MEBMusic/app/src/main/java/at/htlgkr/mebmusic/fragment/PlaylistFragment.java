@@ -1,41 +1,37 @@
 package at.htlgkr.mebmusic.fragment;
 
 
+import android.content.Context;
 import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.google.gson.JsonObject;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.htlgkr.mebmusic.MediumThumb;
-import at.htlgkr.mebmusic.Thumbnail;
+import at.htlgkr.mebmusic.actvities.MainActivity;
+import at.htlgkr.mebmusic.apitasks.DELETETask;
+import at.htlgkr.mebmusic.thumbnail.MediumThumb;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.PUTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
-import at.htlgkr.mebmusic.models.ModelPlaylist;
 import at.htlgkr.mebmusic.playlist.Playlist;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
@@ -45,19 +41,17 @@ import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
 import retrofit2.Callback;
 import retrofit2.Response;*/
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PlaylistFragment extends Fragment {
+public class PlaylistFragment extends Fragment{
 
     private PlaylistAdapter adapter;
     private LinearLayoutManager manager;
     private List<Playlist> playlistList = new ArrayList<>();
     private String CHANNELID;
-    //private Playlist playlist;
-
+    private MainActivity mAct;
+    private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
 
     public PlaylistFragment(String channelId) {
         this.CHANNELID = channelId;
@@ -66,7 +60,9 @@ public class PlaylistFragment extends Fragment {
     public PlaylistFragment() {
     }
 
-
+    public void setMAct(MainActivity mAct){
+        this.mAct = mAct;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,8 +81,25 @@ public class PlaylistFragment extends Fragment {
 
         registerForContextMenu(rv);
 
+        Context ctx = this.getContext();
+
+        adapter.setOnPlaylistClickListener(new PlaylistAdapter.OnPlaylistClickListener() {
+            @Override
+            public void onPlaylistClick(int position) {
+                Playlist playlist = playlistList.get(position);
+                String id = playlist.getId();
+
+                PlaylistVideoFragment fragment = new PlaylistVideoFragment(id);
+                fragment.setMAct(mAct);
+
+                mAct.setFragment(fragment);
+            }
+        });
+
         return view;
     }
+
+
 
     /*@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -113,6 +126,7 @@ public class PlaylistFragment extends Fragment {
         }
 
         if(item.getItemId() == R.id.context_playlist_bearbeiten){
+
             final int finalEntryID = entryID;
 
             final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlist_edit, null);
@@ -132,6 +146,7 @@ public class PlaylistFragment extends Fragment {
             return true;
         }
         if(item.getItemId() == R.id.context_playlist_details){
+
             Playlist playlist = playlistList.get(entryID);
             AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
@@ -141,45 +156,30 @@ public class PlaylistFragment extends Fragment {
 
             return true;
         }
+        if(item.getItemId() == R.id.context_playlist_delete){
+            Playlist playlist = playlistList.get(entryID);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
-        return super.onContextItemSelected(item);
-    }
+            String url = YoutubeAPI.BASE + YoutubeAPI.ID + playlist.getId() + YoutubeAPI.KEY;
 
-    private void getJson() {
-        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST +  YoutubeAPI.CHANNELID + CHANNELID + YoutubeAPI.KEY;
-        GETTask getTask = new GETTask(url);
-        getTask.execute();
+            DELETETask delTask = new DELETETask(url);
+            delTask.execute();
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        String playlistJson = getTask.getJsonResponse();
-        if (playlistJson != null) {
             try {
-                String split = playlistJson.split("\"items\": ")[1];
-                //String[] itemsSplit = split.split("},");
-                JSONArray jsonarr = new JSONArray(split);
-
-                for (int i = 0; i < jsonarr.length(); i++) {
-                    JSONObject base = jsonarr.getJSONObject(i);
-                    String id = base.get("id").toString();
-                    JSONObject snippetObject = (JSONObject) base.get("snippet");
-                    JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
-                    JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
-                    PlaylistSnippet snippet = new PlaylistSnippet(snippetObject.get("title").toString(), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())), snippetObject.getString("description"));
-                    JSONObject detailsObject = (JSONObject) base.get("contentDetails");
-                    PlaylistDetails playlistDetails = new PlaylistDetails((int) detailsObject.get("itemCount"));
-
-                    playlistList.add(new Playlist(id, snippet, playlistDetails));
-                }
-            } catch (Exception e) {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            String name = playlistList.get(entryID).getSnippet().getTitle();
+
+            playlistList.remove(entryID);
+            adapter.notifyDataSetChanged();
+
+            Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
         }
-        adapter.notifyDataSetChanged();
+
+        return super.onContextItemSelected(item);
     }
 
     private void setUpDialog(View vDialog, int entryID){
@@ -239,8 +239,51 @@ public class PlaylistFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+    private void getJson() {
+        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART_PLAYLIST + YoutubeAPI.CHANNELID + CHANNELID + YoutubeAPI.KEY;
+        GETTask getTask = new GETTask(url);
+        getTask.execute();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String toDoJson = getTask.getJsonResponse();
+        if (toDoJson != null) {
+            try {
+                String split = toDoJson.split("\"items\": ")[1];
+                //String[] itemsSplit = split.split("},");
+                JSONArray jsonarr = new JSONArray(split);
+
+                for (int i = 0; i < jsonarr.length(); i++) {
+                    JSONObject base = jsonarr.getJSONObject(i);
+                    String id = base.get("id").toString();
+                    JSONObject snippetObject = (JSONObject) base.get("snippet");
+                    JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
+                    JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
+                    PlaylistSnippet snippet = new PlaylistSnippet(snippetObject.get("title").toString(), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())), snippetObject.getString("description"));
+                    JSONObject detailsObject = (JSONObject) base.get("contentDetails");
+                    PlaylistDetails playlistDetails = new PlaylistDetails((int) detailsObject.get("itemCount"));
+
+                    playlistList.add(new Playlist(id, snippet, playlistDetails));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+
 
 }
+
+
+
+
 
 //        Call<ModelPlaylist> data = YoutubeAPI.getPlaylistVideo().getYT("https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg");
 //        data.enqueue(new Callback<ModelPlaylist>() {
@@ -262,5 +305,4 @@ public class PlaylistFragment extends Fragment {
 //                Log.e(TAG, "onFailure playlist: ", t);
 //            }
 //        });
-
 //"https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg"

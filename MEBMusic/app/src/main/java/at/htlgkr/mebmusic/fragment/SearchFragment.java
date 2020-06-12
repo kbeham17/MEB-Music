@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,16 +21,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.htlgkr.mebmusic.MediumThumb;
+import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.R;
-import at.htlgkr.mebmusic.Thumbnail;
-import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.adapter.VideoAdapter;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
-import at.htlgkr.mebmusic.playlist.Playlist;
-import at.htlgkr.mebmusic.playlist.PlaylistDetails;
-import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
 import at.htlgkr.mebmusic.videos.Video;
 import at.htlgkr.mebmusic.videos.VideoSnippet;
 

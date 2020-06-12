@@ -6,5 +6,8 @@
         android:title="Details" />
     <item
         android:id="@+id/context_playlist_bearbeiten"
-        android:title="Bearbeiten" />
+        android:title="Edit" />
+    <item
+        android:id="@+id/context_playlist_delete"
+        android:title="Delete" />
 </menu>
