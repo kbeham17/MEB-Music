@@ -137,9 +137,15 @@ public class PlaylistVideoFragment extends Fragment {
 
             final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlistvideos_comment, null);
 
-            setUpDialogComment(vDialog, finalEntryID);
-
             AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+            return true;
+        }
+        if(item.getItemId() == R.id.context_playlistvideos_comment){
+
+            final int finalEntryID = entryID;
+
+            final View vDialog = getLayoutInflater().inflate(R.layout.dialog_playlistvideos_comment, null);
 
             return true;
         }
@@ -147,7 +153,7 @@ public class PlaylistVideoFragment extends Fragment {
         return super.onContextItemSelected(item);
     }
 
-    private void setUpDialogComment(View vDialog, int entryID){
+    private void handleDialogComment(View vDialog, int entryID){
         EditText editComment = vDialog.findViewById(R.id.dialog_playlistvideos_comment);
         String comment = editComment.getText().toString();
     }
