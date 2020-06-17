@@ -1,8 +1,10 @@
 package at.htlgkr.mebmusic.fragment;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.LightingColorFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,14 +21,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.htlgkr.mebmusic.actvities.CredentialSetter;
 import at.htlgkr.mebmusic.actvities.MainActivity;
-import at.htlgkr.mebmusic.apitasks.DELETETask;
+import at.htlgkr.mebmusic.actvities.StartActivity;
+
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
@@ -46,12 +60,17 @@ import retrofit2.Response;*/
  */
 public class PlaylistFragment extends Fragment{
 
+    private com.google.api.services.youtube.YouTube mService;
     private PlaylistAdapter adapter;
     private LinearLayoutManager manager;
     private List<Playlist> playlistList = new ArrayList<>();
     private String CHANNELID;
     private MainActivity mAct;
     private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
+    private static final int RQ_ACCOUNT_PICKER = 1000;
+    private static final int RQ_AUTHORIZATION = 1001;
+    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
+    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     public PlaylistFragment(String channelId) {
         this.CHANNELID = channelId;
@@ -95,6 +114,8 @@ public class PlaylistFragment extends Fragment{
                 mAct.setFragment(fragment);
             }
         });
+
+        mService = CredentialSetter.getmService();
 
         return view;
     }
@@ -147,6 +168,8 @@ public class PlaylistFragment extends Fragment{
         }
         if(item.getItemId() == R.id.context_playlist_details){
 
+
+
             Playlist playlist = playlistList.get(entryID);
             AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
@@ -157,13 +180,10 @@ public class PlaylistFragment extends Fragment{
             return true;
         }
         if(item.getItemId() == R.id.context_playlist_delete){
+
             Playlist playlist = playlistList.get(entryID);
-            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
-            String url = YoutubeAPI.BASE + YoutubeAPI.ID + playlist.getId() + YoutubeAPI.KEY;
-
-            DELETETask delTask = new DELETETask(url);
-            delTask.execute();
+            new DeletePlaylistTask(mService, playlist.getId()).execute();
 
             try {
                 Thread.sleep(1000);
@@ -177,6 +197,7 @@ public class PlaylistFragment extends Fragment{
             adapter.notifyDataSetChanged();
 
             Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
+
         }
 
         return super.onContextItemSelected(item);
@@ -277,10 +298,157 @@ public class PlaylistFragment extends Fragment{
         adapter.notifyDataSetChanged();
     }
 
+    /*public void showGooglePlayServicesAvailabilityErrorDialog(
+            final int connectionStatusCode) {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        Dialog dialog = apiAvailability.getErrorDialog(
+                PlaylistFragment.this,
+                connectionStatusCode,
+                RQ_GOOGLE_PLAY_SERVICES);
+        dialog.show();
+    }*/
 
+    private class DeletePlaylistTask extends AsyncTask<Void, Void, List<String>> {
+        private com.google.api.services.youtube.YouTube mService = null;
+        private String playlistID;
+        private Exception mLastError = null;
+
+        DeletePlaylistTask(com.google.api.services.youtube.YouTube mService, String playlistID) {
+            this.mService = mService;
+            this.playlistID = playlistID;
+        }
+
+        @Override
+        protected List<String> doInBackground(Void... params) {
+            try {
+                return getDataFromApi();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return null;
+            }
+        }
+
+        private List<String> getDataFromApi() throws IOException {
+            mService.playlists().delete(playlistID).execute();
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected void onPostExecute(List<String> output) {
+            if (output == null || output.size() == 0) {
+            } else {
+                output.add(0, "Data retrieved using the YouTube Data API:");
+                for(String s : output){
+                    System.out.println(s);
+                }
+            }
+            CredentialSetter.setmService(mService);
+
+        }
+
+        @Override
+        protected void onCancelled() {
+
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    /*showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());*/
+                    System.out.println("BLALBALBLALBL");
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            RQ_AUTHORIZATION);
+                } else {
+                    System.out.println("The following error occurred:\n"
+                            + mLastError.getMessage());
+                }
+            } else {
+                System.out.println("Request cancelled.");
+            }
+        }
+    }
+
+    private class EditTitleTask extends AsyncTask<Void, Void, List<String>> {
+        private com.google.api.services.youtube.YouTube mService = null;
+        private String playlistID;
+        private Exception mLastError = null;
+
+        EditTitleTask(com.google.api.services.youtube.YouTube mService, String title) {
+            this.mService = mService;
+            this.playlistID = playlistID;
+        }
+
+        @Override
+        protected List<String> doInBackground(Void... params) {
+            try {
+                return getDataFromApi();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return null;
+            }
+        }
+
+        private List<String> getDataFromApi() throws IOException {
+            /*mService.playlists().update("snippet").execute();
+            com.google.api.services.youtube.model.Playlist playlist = new com.google.api.services.youtube.model.Playlist();
+
+            playlist.
+            */
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected void onPostExecute(List<String> output) {
+            if (output == null || output.size() == 0) {
+            } else {
+                output.add(0, "Data retrieved using the YouTube Data API:");
+                for(String s : output){
+                    System.out.println(s);
+                }
+            }
+            CredentialSetter.setmService(mService);
+
+        }
+
+        @Override
+        protected void onCancelled() {
+
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    /*showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());*/
+                    System.out.println("BLALBALBLALBL");
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            RQ_AUTHORIZATION);
+                } else {
+                    System.out.println("The following error occurred:\n"
+                            + mLastError.getMessage());
+                }
+            } else {
+                System.out.println("Request cancelled.");
+            }
+        }
+    }
 
 }
-
 
 
 

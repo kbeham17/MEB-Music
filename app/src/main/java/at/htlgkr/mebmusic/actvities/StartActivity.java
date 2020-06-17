@@ -4,9 +4,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -14,13 +14,9 @@ import com.google.api.client.util.ExponentialBackOff;
 
 import com.google.api.services.youtube.YouTubeScopes;
 
-import com.google.api.services.youtube.model.*;
-
 import android.Manifest;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,12 +24,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -44,28 +36,22 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.api.services.youtube.model.Channel;
+import com.google.api.services.youtube.model.ChannelListResponse;
 
 import at.htlgkr.mebmusic.R;
 
 public class StartActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks {
 
     SignInButton signInButton;
-    GoogleAccountCredential mCredential;
+    public GoogleAccountCredential mCredential;
 
     private Button mCallApiButton;
     private TextView mOutputText;
@@ -79,7 +65,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
     private static final String BUTTON_TEXT = "Call YouTube Data API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = { YouTubeScopes.YOUTUBE_READONLY };
+    private static final String[] SCOPES = { YouTubeScopes.YOUTUBE_FORCE_SSL };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +78,6 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onClick(View view) {
                 getResultsFromApi();
-                finish();
             }
         });
 
@@ -126,6 +111,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         } else if (!isDeviceOnline()) {
             Toast.makeText(this, "No network connection available.", Toast.LENGTH_LONG);
         } else {
+
             new MakeRequestTask(mCredential).execute();
         }
     }
@@ -162,7 +148,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         switch(requestCode) {
             case RQ_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                    mOutputText.setText(
+                    System.out.println(
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
@@ -204,7 +190,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        System.out.println("FEHLERFEHLERFEHLER");
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -223,7 +209,6 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
-
     }
 
     public void showGooglePlayServicesAvailabilityErrorDialog(
@@ -235,22 +220,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                 RQ_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
-    /*
-        @Override
-        protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
 
-            if(requestCode == RQ_SIGN_IN){
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
-                if(result.isSuccess()){
-                    finish();
-                } else {
-                    Toast.makeText(this,"Login Failed!", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    */
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
 
@@ -283,20 +253,22 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
         @Override
         protected List<String> doInBackground(Void... params) {
-            try {
+            /*try {
                 return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
                 return null;
-            }
+            }*/
+            return null;
         }
 
         private List<String> getDataFromApi() throws IOException {
+            //mService.playlists().delete("PL5I2c6CPyev5xReL1Dk3E90FY-gSk3CMv").execute();
 
             List<String> channelInfo = new ArrayList<String>();
             ChannelListResponse result = mService.channels().list("snippet,contentDetails,statistics")
-                    .setForUsername("GoogleDevelopers")
+                    .setForUsername(mCredential.getSelectedAccountName())
                     .execute();
             List<Channel> channels = result.getItems();
             if (channels != null) {
@@ -318,12 +290,18 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
+                for (String s : output) {
+                    System.out.println(s);
+                }
             }
+
+            CredentialSetter.setmService(mService);
+
+            finish();
         }
 
         @Override
         protected void onCancelled() {
-
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
                     showGooglePlayServicesAvailabilityErrorDialog(
@@ -334,12 +312,13 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             RQ_AUTHORIZATION);
                 } else {
-                    mOutputText.setText("The following error occurred:\n"
+                    System.out.println("The following error occurred:\n"
                             + mLastError.getMessage());
                 }
             } else {
-                mOutputText.setText("Request cancelled.");
+                System.out.println("Request cancelled.");
             }
         }
+        }
     }
-}
+
