@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/context_playlistvideos_rate"
-        android:title="Rate" />
+        android:id="@+id/context_playlistvideos_details"
+        android:title="Details " />
     <item
         android:id="@+id/context_playlistvideos_comment"
         android:title="Comment " />

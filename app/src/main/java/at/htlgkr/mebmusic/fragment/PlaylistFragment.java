@@ -2,14 +2,12 @@ package at.htlgkr.mebmusic.fragment;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.htlgkr.mebmusic.actvities.MainActivity;
+import at.htlgkr.mebmusic.apitasks.DELETETask;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
@@ -155,6 +155,28 @@ public class PlaylistFragment extends Fragment{
             dialog.show();
 
             return true;
+        }
+        if(item.getItemId() == R.id.context_playlist_delete){
+            Playlist playlist = playlistList.get(entryID);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+            String url = YoutubeAPI.BASE + YoutubeAPI.ID + playlist.getId() + YoutubeAPI.KEY;
+
+            DELETETask delTask = new DELETETask(url);
+            delTask.execute();
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            String name = playlistList.get(entryID).getSnippet().getTitle();
+
+            playlistList.remove(entryID);
+            adapter.notifyDataSetChanged();
+
+            Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
         }
 
         return super.onContextItemSelected(item);
