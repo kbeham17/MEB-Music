@@ -187,7 +187,7 @@ public class PlaylistVideoFragment extends Fragment {
 
             Video video = videoList.get(entryID);
 
-            new DeleteVideoItem(mService, "wY1cNLqAPpk").execute();
+            new DeleteVideoItem(mService, video.getPlaylistVideoId()).execute();
 
             try {
                 Thread.sleep(1000);
@@ -281,6 +281,7 @@ public class PlaylistVideoFragment extends Fragment {
 
                 for (int i = 0; i < jsonarr.length(); i++) {
                     JSONObject base = jsonarr.getJSONObject(i);
+                    String playlistVideoId = base.getString("id");
                     JSONObject snippetObject = (JSONObject) base.get("snippet");
                     JSONObject resourceIdObject = (JSONObject) snippetObject.get("resourceId");
                     String id = resourceIdObject.get("videoId").toString();
@@ -289,7 +290,7 @@ public class PlaylistVideoFragment extends Fragment {
                     VideoSnippet snippet = new VideoSnippet(snippetObject.getString("publishedAt"), snippetObject.get("title").toString(),snippetObject.getString("description"), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
 
 
-                    videoList.add(new Video(id, snippet));
+                    videoList.add(new Video(id,playlistVideoId, snippet));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
