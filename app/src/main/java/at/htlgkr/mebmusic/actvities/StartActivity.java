@@ -58,10 +58,10 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
     private GoogleApiClient googleApiClient;
 
     public static final int RQ_SIGN_IN = 1;
-    public static final int RQ_ACCOUNT_PICKER = 1000;
-    public static final int RQ_AUTHORIZATION = 1001;
-    public static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    public static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
+    public static final int RQ_ACCOUNT_PICKER = 2000;
+    public static final int RQ_AUTHORIZATION = 2001;
+    public static final int RQ_GOOGLE_PLAY_SERVICES = 2002;
+    public static final int RQ_PERMISSION_GET_ACCOUNTS = 2003;
 
     private static final String BUTTON_TEXT = "Call YouTube Data API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
@@ -75,8 +75,8 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         mCallApiButton = findViewById(R.id.mCallApiButton);
 
         mCallApiButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                @Override
+                public void onClick(View view) {
                 getResultsFromApi();
             }
         });
