@@ -139,8 +139,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                         case R.id.menu_search:
 
+                            String chanelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
+
+                            if (chanelId.equals("")){
+                                chanelId = "UCMnR3J-chev22dTqJEquFcg";
+                            }
+
                             String order = prefs.getString("list_preference_order", "relevance");
-                            searchFragment = new SearchFragment(order);
+                            searchFragment = new SearchFragment(order, chanelId);
                             setFragment(searchFragment);
                             return true;
 

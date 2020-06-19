@@ -21,6 +21,10 @@ import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.services.youtube.model.Comment;
+import com.google.api.services.youtube.model.CommentSnippet;
+import com.google.api.services.youtube.model.CommentThread;
+import com.google.api.services.youtube.model.CommentThreadSnippet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,6 +65,8 @@ public class PlaylistVideoFragment extends Fragment {
     private List<Video> videoList = new ArrayList<>();
     Bundle extra;
 
+    private String channelID;
+
     private static final int RQ_ACCOUNT_PICKER = 1000;
     private static final int RQ_AUTHORIZATION = 2001;
     private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
@@ -68,8 +74,9 @@ public class PlaylistVideoFragment extends Fragment {
 
     public PlaylistVideoFragment() {}
 
-    public PlaylistVideoFragment(String id){
+    public PlaylistVideoFragment(String id, String channelID){
         this.id = id;
+        this.channelID = channelID;
     }
 
     @Override
@@ -211,8 +218,15 @@ public class PlaylistVideoFragment extends Fragment {
         EditText editComment = vDialog.findViewById(R.id.dialog_playlistvideos_comment);
         String comment = editComment.getText().toString();
 
+        Video video = videoList.get(entryID);
 
+        new CommentVideoItem(mService, video.getVideoID(), comment).execute();
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void intializeView(View view){
@@ -393,6 +407,88 @@ public class PlaylistVideoFragment extends Fragment {
 
         private List<String> getDataFromApi() throws IOException {
             mService.playlistItems().delete(vidID).execute();
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected void onPostExecute(List<String> output) {
+            if (output == null || output.size() == 0) {
+            } else {
+                output.add(0, "Data retrieved using the YouTube Data API:");
+                for(String s : output){
+                    System.out.println(s);
+                }
+            }
+            CredentialSetter.setmService(mService);
+
+        }
+
+        @Override
+        protected void onCancelled() {
+
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    /*showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());*/
+
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            RQ_AUTHORIZATION);
+                } else {
+                    System.out.println("The following error occurred:\n"
+                            + mLastError.getMessage());
+                }
+            } else {
+                System.out.println("Request cancelled.");
+            }
+        }
+    }
+
+    private class CommentVideoItem extends AsyncTask<Void, Void, List<String>> {
+        private com.google.api.services.youtube.YouTube mService = null;
+        private String vidID;
+        private String text;
+        private Exception mLastError = null;
+
+        CommentVideoItem(com.google.api.services.youtube.YouTube mService, String vidID, String text) {
+            this.mService = mService;
+            this.vidID = vidID;
+            this.text = text;
+        }
+
+        @Override
+        protected List<String> doInBackground(Void... params) {
+            try {
+                return getDataFromApi();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return null;
+            }
+        }
+
+        private List<String> getDataFromApi() throws IOException {
+
+            CommentSnippet cs = new CommentSnippet();
+            cs.setTextOriginal(text);
+            Comment c = new Comment();
+            c.setSnippet(cs);
+
+            CommentThreadSnippet cts = new CommentThreadSnippet();
+            cts.setChannelId(channelID).setVideoId(vidID).setTopLevelComment(c);
+
+            CommentThread ct = new CommentThread();
+            ct.setSnippet(cts);
+
+            mService.commentThreads().insert("snippet", ct).execute();
 
             return null;
         }

@@ -266,7 +266,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         private List<String> getDataFromApi() throws IOException {
             //mService.playlists().delete("PL5I2c6CPyev5xReL1Dk3E90FY-gSk3CMv").execute();
 
-            List<String> channelInfo = new ArrayList<String>();
+            /*List<String> channelInfo = new ArrayList<String>();
             ChannelListResponse result = mService.channels().list("snippet,contentDetails,statistics")
                     .setForUsername(mCredential.getSelectedAccountName())
                     .execute();
@@ -276,8 +276,8 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                 channelInfo.add("This channel's ID is " + channel.getId() + ". " +
                         "Its title is '" + channel.getSnippet().getTitle() + ", " +
                         "and it has " + channel.getStatistics().getViewCount() + " views.");
-            }
-            return channelInfo;
+            }*/
+            return null;
         }
 
         @Override

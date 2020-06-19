@@ -108,7 +108,7 @@ public class PlaylistFragment extends Fragment{
                 Playlist playlist = playlistList.get(position);
                 String id = playlist.getId();
 
-                PlaylistVideoFragment fragment = new PlaylistVideoFragment(id);
+                PlaylistVideoFragment fragment = new PlaylistVideoFragment(id, CHANNELID);
                 fragment.setMAct(mAct);
 
                 mAct.setFragment(fragment);
@@ -224,7 +224,15 @@ public class PlaylistFragment extends Fragment{
         String newTitle = editDialogTitle.getText().toString();
         String newDesc = editDialogDescription.getText().toString();
 
-        String jsonRequest = "{\"id\":\""+ playlist.getId() +"\",\"snippet\":{\"title\":\""+ newTitle+"\",\"description\":\""+ newDesc+"\"}}";
+        new EditTitleTask(mService, playlist.getId(), newTitle, newDesc).execute();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /*String jsonRequest = "{\"id\":\""+ playlist.getId() +"\",\"snippet\":{\"title\":\""+ newTitle+"\",\"description\":\""+ newDesc+"\"}}";
         PUTTask putTask = new PUTTask(YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART + YoutubeAPI.KEY);
         putTask.execute(jsonRequest);
 
@@ -256,7 +264,7 @@ public class PlaylistFragment extends Fragment{
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         adapter.notifyDataSetChanged();
     }
 
@@ -379,11 +387,15 @@ public class PlaylistFragment extends Fragment{
     private class EditTitleTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.youtube.YouTube mService = null;
         private String playlistID;
+        private String title;
+        private String desc;
         private Exception mLastError = null;
 
-        EditTitleTask(com.google.api.services.youtube.YouTube mService, String title) {
+        EditTitleTask(com.google.api.services.youtube.YouTube mService, String playlistID, String title, String desc) {
             this.mService = mService;
             this.playlistID = playlistID;
+            this.title = title;
+            this.desc = desc;
         }
 
         @Override
@@ -398,11 +410,15 @@ public class PlaylistFragment extends Fragment{
         }
 
         private List<String> getDataFromApi() throws IOException {
-            /*mService.playlists().update("snippet").execute();
+
             com.google.api.services.youtube.model.Playlist playlist = new com.google.api.services.youtube.model.Playlist();
 
-            playlist.
-            */
+            com.google.api.services.youtube.model.PlaylistSnippet ps = new com.google.api.services.youtube.model.PlaylistSnippet();
+            ps.setTitle(title).setDescription(desc);
+
+            playlist.setId(playlistID).setSnippet(ps);
+
+            mService.playlists().update("snippet,contentDetails", playlist).execute();
 
             return null;
         }
