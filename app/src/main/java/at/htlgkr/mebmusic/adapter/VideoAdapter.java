@@ -1,6 +1,7 @@
 package at.htlgkr.mebmusic.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.youtube.player.YouTubeIntents;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

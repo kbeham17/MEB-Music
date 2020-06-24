@@ -1,6 +1,10 @@
 package at.htlgkr.mebmusic.fragment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.LightingColorFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -19,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeIntents;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.youtube.model.Comment;
@@ -43,6 +48,7 @@ import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.POSTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
 import at.htlgkr.mebmusic.playlist.Playlist;
+import at.htlgkr.mebmusic.sensor.ShakeDetector;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.videos.Video;
@@ -99,11 +105,11 @@ public class PlaylistVideoFragment extends Fragment {
         intializeView(view);
         getJson();
 
-
         adapter.setOnVideoClickListener(new VideoAdapter.OnVideoClickListener() {
             @Override
             public void onVideoClick(int position) {
-
+                Intent intent = YouTubeIntents.createPlayVideoIntent(getContext(), videoList.get(position).getVideoID());
+                startActivity(intent);
             }
         });
 
@@ -532,5 +538,12 @@ public class PlaylistVideoFragment extends Fragment {
                 System.out.println("Request cancelled.");
             }
         }
+    }
+
+    //Sensor
+
+    public void shake(Context context){
+        Intent intent = YouTubeIntents.createPlayPlaylistIntent(context, id);
+        startActivity(intent);
     }
 }

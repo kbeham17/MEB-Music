@@ -6,13 +6,21 @@ import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -52,9 +60,14 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
+import at.htlgkr.mebmusic.fragment.PlaylistVideoFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
+import at.htlgkr.mebmusic.sensor.ShakeDetector;
 import pub.devrel.easypermissions.EasyPermissions;
+
+import com.google.android.youtube.player.YouTubeIntents;
+
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks{
 
@@ -87,10 +100,30 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
     private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
+    private SensorManager mSensorManager;
+    private Sensor mAccelaerometer;
+    private ShakeDetector mShakeDetector;
+
+    protected static final String CHANNEL_ID = "12345";
+    protected static final int NOTIFICATION_ID_STANDARD = 1;
+    private Boolean networkAvailable = true;
+    private Context context = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelaerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mShakeDetector = new ShakeDetector();
+        mShakeDetector.setOnShakeListener(new ShakeDetector.OnShakeListener() {
+            @Override
+            public void onShake(int count) {
+                PlaylistVideoFragment playlistVideoFragment = new PlaylistVideoFragment();
+                playlistVideoFragment.shake(context);
+            }
+        });
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -174,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }
         });
+            createNotificationChannel();
+        showNotification();
     }
 
     private void gotoStartActivity() {
@@ -239,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ft.commit();
     }
 
-
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
 
@@ -249,4 +283,64 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onPermissionsDenied(int requestCode, List<String> perms) {
 
     }
+
+    //notifications implementation:
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public void showNotification() {
+        Context context = this;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                networkAvailable = isNetworkAvailable();
+                if(networkAvailable == false || networkAvailable == null){
+                    Notification.Builder builder  = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        builder = new Notification.Builder(context, CHANNEL_ID)
+                                .setSmallIcon(android.R.drawable.star_big_on)
+                                .setColor(Color.YELLOW)
+                                .setContentTitle(getString(R.string.app_name))
+                                .setContentText("You are not connected to a network!")
+                                .setStyle(new Notification.BigTextStyle()
+                                        .bigText("Please connect to a network, to access all the functions in the app."))
+                                .setWhen(System.currentTimeMillis())
+                                .setAutoCancel(true);
+                    }
+
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    // notificationId is a unique int for each notification that you must define
+                    notificationManager.notify(NOTIFICATION_ID_STANDARD, builder.build());
+                }
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
 }
