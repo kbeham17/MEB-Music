@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory>
+
     <EditTextPreference
+        android:defaultValue="Default value"
         android:key="edit_text_channelId"
         android:selectAllOnFocus="true"
         android:singleLine="true"
@@ -12,5 +13,4 @@
         android:entryValues="@array/orderBy"
         android:key="list_preference_order"
         android:title="List preference" />
-</PreferenceCategory>
 </PreferenceScreen>
