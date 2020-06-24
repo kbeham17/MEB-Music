@@ -35,6 +35,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import at.htlgkr.mebmusic.fragment.PlaylistVideoAddFragment;
+import at.htlgkr.mebmusic.videos.Video;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import androidx.annotation.NonNull;
@@ -72,10 +75,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static String id;
 
     private PlaylistFragment playlistFragment = new PlaylistFragment("");
+    private PlaylistVideoAddFragment playlistVideoAddFragment;
     private ProfileFragment profileFragment = new ProfileFragment(null, null);
     private SearchFragment searchFragment = new SearchFragment();
 
-    private FragmentTransaction ft;
+    public static FragmentTransaction ft;
 
     private SharedPreferences prefs;
 
@@ -86,7 +90,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private Button buttonLogout;
 
     private GoogleAccountCredential mCredential;
-    ProgressDialog mProgress;
+
+
+    private MainActivity mAct;
 
     private static final int RQ_RESULT_START_ACTIVITY = 1;
     private static final int RQ_ACCOUNT_PICKER = 1000;
@@ -116,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         menuBottomNavigationView.setSelectedItemId(R.id.menu_profile);
 
-        MainActivity mAct = this;
+        mAct = this;
 
         menuBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -154,12 +160,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                             String order = prefs.getString("list_preference_order", "relevance");
                             searchFragment = new SearchFragment(order, chanelId);
+                            searchFragment.setmAct(mAct);
                             setFragment(searchFragment);
+
                             return true;
 
                         case R.id.menu_logout:
 
-                            Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
+                            /*Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
                                 @Override
                                 public void onResult(@NonNull Status status) {
                                     if (status.isSuccess()) {
@@ -168,7 +176,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                         Toast.makeText(MainActivity.this, "Login Failed!", Toast.LENGTH_LONG).show();
                                     }
                                 }
-                            });
+                            });*/
+
+                            StartActivity.logoff();
+
                             return true;
 
                         default:
@@ -246,6 +257,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ft.commit();
     }
 
+    public void setPlaylistVideoAddFragment(List<Video> videoList){
+        String chanelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
+
+        if (chanelId.equals("")){
+            chanelId = "UCMnR3J-chev22dTqJEquFcg";
+        }
+
+        playlistVideoAddFragment = new PlaylistVideoAddFragment(chanelId, videoList);
+        playlistVideoAddFragment.setMAct(mAct);
+
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.frame_main, playlistVideoAddFragment);
+        ft.commit();
+    }
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {

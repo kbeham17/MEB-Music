@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,11 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.htlgkr.mebmusic.actvities.CredentialSetter;
+import at.htlgkr.mebmusic.actvities.MainActivity;
 import at.htlgkr.mebmusic.adapter.SearchVideoAdapter;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
-import at.htlgkr.mebmusic.adapter.VideoAdapter;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
 import at.htlgkr.mebmusic.videos.Video;
@@ -59,11 +60,10 @@ public class SearchFragment extends Fragment {
     private String order;
     private List<Video> videoList = new ArrayList<>();
     private String channelID;
+    private MainActivity mAct;
 
-    private static final int RQ_ACCOUNT_PICKER = 1000;
+    private static final int RQ_PLAYLISTVIDADD = 999;
     private static final int RQ_AUTHORIZATION = 1001;
-    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     public SearchFragment() {
 
@@ -74,6 +74,9 @@ public class SearchFragment extends Fragment {
         this.channelID = channelID;
     }
 
+    public void setmAct(MainActivity mAct){
+        this.mAct = mAct;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -199,9 +202,7 @@ public class SearchFragment extends Fragment {
         }
         if(item.getItemId() == R.id.context_search_video_add){
 
-
-
-
+            mAct.setPlaylistVideoAddFragment(videoList);
 
 
             /*AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();

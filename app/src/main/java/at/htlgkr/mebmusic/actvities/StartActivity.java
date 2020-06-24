@@ -1,5 +1,6 @@
 package at.htlgkr.mebmusic.actvities;
 
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -51,13 +52,13 @@ import at.htlgkr.mebmusic.R;
 public class StartActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks {
 
     SignInButton signInButton;
-    public GoogleAccountCredential mCredential;
+    public static GoogleAccountCredential mCredential;
 
     private Button mCallApiButton;
     private TextView mOutputText;
     private GoogleApiClient googleApiClient;
 
-    public static final int RQ_SIGN_IN = 1;
+
     public static final int RQ_ACCOUNT_PICKER = 1000;
     public static final int RQ_AUTHORIZATION = 1001;
     public static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
@@ -82,25 +83,6 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         });
 
         mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
-
-        /*GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        googleApiClient = new GoogleApiClient
-                .Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        signInButton = findViewById(R.id.googleSignIn);
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-                startActivityForResult(intent, RQ_SIGN_IN);
-            }
-        });*/
     }
 
     private void getResultsFromApi(){
@@ -167,6 +149,8 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
+                        CredentialSetter.setName(accountName);
+
                         getResultsFromApi();
                     }
                 }
@@ -190,7 +174,11 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        System.out.println("FEHLERFEHLERFEHLER");
+        try {
+            throw new Exception();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -296,6 +284,8 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
             }
 
             CredentialSetter.setmService(mService);
+            String name = mCredential.getSelectedAccountName();
+            CredentialSetter.setName(name);
 
             finish();
         }
@@ -319,6 +309,18 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                 System.out.println("Request cancelled.");
             }
         }
+        }
+
+        public static void logoff(){
+            try {
+                String token = mCredential.getToken();
+                String accountType = mCredential.getSelectedAccount().type;
+                mCredential.getGoogleAccountManager().getAccountManager().invalidateAuthToken(accountType, token);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (GoogleAuthException e) {
+                e.printStackTrace();
+            }
         }
     }
 

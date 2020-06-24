@@ -1,11 +1,15 @@
 package at.htlgkr.mebmusic.fragment;
 
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +20,9 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.net.URI;
+
+import at.htlgkr.mebmusic.actvities.CredentialSetter;
 import at.htlgkr.mebmusic.actvities.PreferenceActivity;
 import at.htlgkr.mebmusic.R;
 
@@ -60,12 +67,21 @@ public class ProfileFragment extends Fragment {
     }
 
     public void setupProfile(View view) {
-        if (profilePictureUrl != null && name != null) {
+
+            String profilePictureUrl = ContactsContract.Contacts.PHOTO_THUMBNAIL_URI;
+            String[] projection = new String[]
+                {
+                        ContactsContract.Profile._ID,
+                        ContactsContract.Profile.DISPLAY_NAME_PRIMARY,
+                        ContactsContract.Profile.LOOKUP_KEY,
+                        ContactsContract.Profile.PHOTO_THUMBNAIL_URI
+                };
+
             textGoogleName = view.findViewById(R.id.text_google_name);
             googleProfilePicture = view.findViewById(R.id.iv_google_profile_picture);
 
-            textGoogleName.setText(name);
-            Picasso.get()
+            textGoogleName.setText(CredentialSetter.getName());
+            /*Picasso.get()
                     .load(profilePictureUrl)
                     .placeholder(R.mipmap.ic_launcher)
                     .fit()
@@ -79,9 +95,9 @@ public class ProfileFragment extends Fragment {
                         public void onError(Exception e) {
                             e.printStackTrace();
                         }
-                    });
+                    });*/
 
-        }
+
     }
 
     /*public static String getName() {
