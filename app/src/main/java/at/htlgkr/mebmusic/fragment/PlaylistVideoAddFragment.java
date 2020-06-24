@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.services.youtube.model.PlaylistItem;
+import com.google.api.services.youtube.model.PlaylistItemSnippet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,6 +41,8 @@ import at.htlgkr.mebmusic.videos.Video;
 
 public class PlaylistVideoAddFragment extends Fragment {
 
+
+    private static final String KIND = "youtube#video";
     private String CHANNELID;
 
     private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
@@ -48,7 +52,7 @@ public class PlaylistVideoAddFragment extends Fragment {
     private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     private List<Playlist> playlistList = new ArrayList<>();
-    private List<Video> videoList;
+    private Video video;
     private MainActivity mAct;
     private com.google.api.services.youtube.YouTube mService;
 
@@ -59,19 +63,32 @@ public class PlaylistVideoAddFragment extends Fragment {
 
     }
 
-    public PlaylistVideoAddFragment(String CHANNELID, List<Video> videoList){
-        this.videoList = videoList;
+    public PlaylistVideoAddFragment(String CHANNELID, Video video){
+        this.video = video;
         this.CHANNELID = CHANNELID;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_playlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_playlistvideoadd, container, false);
 
         this.mService = CredentialSetter.getmService();
 
         lv = view.findViewById(R.id.listview_playlistvideoadd);
+
+
+
+        Context ctx = getContext();
+        mAdapt = new PlaylistVideoAddAdapter(ctx, R.layout.row_item_playlistvideoadd, playlistList);
+
+        playlistList.clear();
+
+        PlaylistSnippet playlistSnippet = new PlaylistSnippet("neue Playlist erstellen", null, null);
+        PlaylistDetails playlistDetails = new PlaylistDetails(0);
+        playlistList.add(new Playlist("-1", playlistSnippet, playlistDetails));
+
+        getJson();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -87,7 +104,7 @@ public class PlaylistVideoAddFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
-                    new AddPlaylistVideo(mService, playlist).execute();
+                    new AddPlaylistVideo(mService, playlist, video).execute();
 
                     try {
                         Thread.sleep(1000);
@@ -97,17 +114,6 @@ public class PlaylistVideoAddFragment extends Fragment {
                 }
             }
         });
-
-        Context ctx = getContext();
-        mAdapt = new PlaylistVideoAddAdapter(ctx, R.layout.row_item_playlistvideoadd, playlistList);
-
-        playlistList.clear();
-
-        PlaylistSnippet playlistSnippet = new PlaylistSnippet("neue Playlist erstellen", null, null);
-        PlaylistDetails playlistDetails = new PlaylistDetails(0);
-        playlistList.add(new Playlist("-1", playlistSnippet, playlistDetails));
-
-        getJson();
 
         return view;
     }
@@ -232,10 +238,12 @@ public class PlaylistVideoAddFragment extends Fragment {
         private com.google.api.services.youtube.YouTube mService = null;
         private Playlist playlist;
         private Exception mLastError = null;
+        private Video video;
 
-        AddPlaylistVideo(com.google.api.services.youtube.YouTube mService, Playlist playlist) {
+        AddPlaylistVideo(com.google.api.services.youtube.YouTube mService, Playlist playlist, Video video) {
             this.mService = mService;
             this.playlist = playlist;
+            this.video = video;
         }
 
         @Override
@@ -250,10 +258,12 @@ public class PlaylistVideoAddFragment extends Fragment {
         }
 
         private List<String> getDataFromApi() throws IOException {
+            PlaylistItem playlistItem = new PlaylistItem();
+            PlaylistItemSnippet playlistItemSnippet = new PlaylistItemSnippet();
+            playlistItemSnippet.setChannelId(CHANNELID);
+            playlistItem.setSnippet(playlistItemSnippet).setId(video.getVideoID()).setKind(KIND);
 
-
-
-
+            mService.playlistItems().insert("snippet", playlistItem);
 
             return null;
         }

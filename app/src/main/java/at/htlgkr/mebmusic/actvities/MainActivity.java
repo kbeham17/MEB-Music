@@ -257,14 +257,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ft.commit();
     }
 
-    public void setPlaylistVideoAddFragment(List<Video> videoList){
+    public void setPlaylistVideoAddFragment(Video video){
         String chanelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
 
         if (chanelId.equals("")){
             chanelId = "UCMnR3J-chev22dTqJEquFcg";
         }
 
-        playlistVideoAddFragment = new PlaylistVideoAddFragment(chanelId, videoList);
+        playlistVideoAddFragment = new PlaylistVideoAddFragment(chanelId, video);
         playlistVideoAddFragment.setMAct(mAct);
 
         ft = getSupportFragmentManager().beginTransaction();

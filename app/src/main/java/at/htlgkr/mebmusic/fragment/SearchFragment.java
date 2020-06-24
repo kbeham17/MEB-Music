@@ -202,7 +202,10 @@ public class SearchFragment extends Fragment {
         }
         if(item.getItemId() == R.id.context_search_video_add){
 
-            mAct.setPlaylistVideoAddFragment(videoList);
+            final int finalEntryID = entryID;
+            Video video = videoList.get(entryID);
+
+            mAct.setPlaylistVideoAddFragment(video);
 
 
             /*AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
