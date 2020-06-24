@@ -68,7 +68,7 @@ public class PlaylistVideoFragment extends Fragment {
     private String channelID;
 
     private static final int RQ_ACCOUNT_PICKER = 1000;
-    private static final int RQ_AUTHORIZATION = 1001;
+    private static final int RQ_AUTHORIZATION = 2001;
     private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
     private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
