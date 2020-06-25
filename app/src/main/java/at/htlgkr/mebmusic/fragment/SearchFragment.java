@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.htlgkr.mebmusic.actvities.CredentialSetter;
+import at.htlgkr.mebmusic.actvities.MainActivity;
 import at.htlgkr.mebmusic.adapter.SearchVideoAdapter;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.R;
@@ -58,6 +59,7 @@ public class SearchFragment extends Fragment {
     private String order;
     private List<Video> videoList = new ArrayList<>();
     private String channelID;
+    private MainActivity mAct;
 
     private static final int RQ_AUTHORIZATION = 1001;
 
@@ -69,6 +71,9 @@ public class SearchFragment extends Fragment {
         this.channelID = channelID;
     }
 
+    public void setmAct(MainActivity mAct) {
+        this.mAct = mAct;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -201,6 +206,8 @@ public class SearchFragment extends Fragment {
         }
         if (item.getItemId() == R.id.context_search_video_add) {
 
+            final int finalEntryID = entryID;
+            Video video = videoList.get(entryID);
 
             mAct.setPlaylistVideoAddFragment(video);
 
