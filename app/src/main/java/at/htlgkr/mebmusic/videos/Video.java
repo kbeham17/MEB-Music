@@ -2,6 +2,7 @@ package at.htlgkr.mebmusic.videos;
 
 public class Video {
     private String videoID;
+    private String playlistVideoId;
     private VideoSnippet snippet;
 
     public Video(){
@@ -9,6 +10,12 @@ public class Video {
 
     public Video(String videoID, VideoSnippet snippet) {
         this.videoID = videoID;
+        this.snippet = snippet;
+    }
+
+    public Video(String videoID, String playlistVideoId,  VideoSnippet snippet) {
+        this.videoID = videoID;
+        this.playlistVideoId = playlistVideoId;
         this.snippet = snippet;
     }
 
@@ -26,5 +33,13 @@ public class Video {
 
     public void setSnippet(VideoSnippet snippet) {
         this.snippet = snippet;
+    }
+
+    public String getPlaylistVideoId() {
+        return playlistVideoId;
+    }
+
+    public void setPlaylistVideoId(String playlistVideoId) {
+        this.playlistVideoId = playlistVideoId;
     }
 }

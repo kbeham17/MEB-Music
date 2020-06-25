@@ -16,19 +16,19 @@ import java.util.List;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.videos.Video;
 
-public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SearchVideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private List<Video> videoList;
     private int position;
-    private VideoAdapter.OnVideoClickListener mListener;
+    private SearchVideoAdapter.OnVideoClickListener mListener;
 
-    public VideoAdapter(Context context, List<Video> videoList) {
+    public SearchVideoAdapter(Context context, List<Video> videoList) {
         this.context = context;
         this.videoList = videoList;
     }
 
-    public void setOnVideoClickListener(VideoAdapter.OnVideoClickListener listener){
+    public void setOnVideoClickListener(SearchVideoAdapter.OnVideoClickListener listener){
         mListener = listener;
     }
 
@@ -36,11 +36,11 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         ImageView thumbnail;
         TextView title, date;
 
-        public YoutubeHolder(View itemView, VideoAdapter.OnVideoClickListener listener){
+        public YoutubeHolder(View itemView, SearchVideoAdapter.OnVideoClickListener listener){
             super(itemView);
-            thumbnail = itemView.findViewById(R.id.iv_video_thumb);
-            title = itemView.findViewById(R.id.text_video_title);
-            date = itemView.findViewById(R.id.text_video_date);
+            thumbnail = itemView.findViewById(R.id.iv_search_video_thumb);
+            title = itemView.findViewById(R.id.text_search_video_title);
+            date = itemView.findViewById(R.id.text_search_video_date);
 
             itemView.setOnCreateContextMenuListener(this);
 
@@ -82,9 +82,10 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(Menu.NONE, R.id.context_playlistvideos_details, Menu.NONE, "Details");
-            menu.add(Menu.NONE, R.id.context_playlistvideos_comment, Menu.NONE, "Comment");
-            menu.add(Menu.NONE, R.id.context_playlistvideos_delete, Menu.NONE, "Delete");
+            menu.add(Menu.NONE, R.id.context_search_video_add, Menu.NONE, "Add to Playlist");
+            menu.add(Menu.NONE, R.id.context_search_video_details, Menu.NONE, "Details");
+            menu.add(Menu.NONE, R.id.context_search_video_comment, Menu.NONE, "Comment");
+
         }
     }
 
@@ -92,7 +93,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.row_item_video, parent, false);
+        View view = inflater.inflate(R.layout.row_item_search_video, parent, false);
         return new YoutubeHolder(view, mListener);
     }
 

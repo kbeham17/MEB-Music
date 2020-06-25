@@ -13,7 +13,7 @@ public class PUTTask extends AsyncTask<String, Integer, String> {
     String jsonResponse;
 
     public PUTTask(String URL) {
-        this.URL=URL;
+        this.URL = URL;
     }
 
 
@@ -34,7 +34,6 @@ public class PUTTask extends AsyncTask<String, Integer, String> {
             connection.setFixedLengthStreamingMode(jsonString.getBytes().length);
             connection.getOutputStream().write(jsonString.getBytes());
             connection.getOutputStream().flush();
-
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK ||
@@ -61,7 +60,7 @@ public class PUTTask extends AsyncTask<String, Integer, String> {
         return stringBuilder.toString();
     }
 
-    public String getJsonResponse(){
+    public String getJsonResponse() {
         return jsonResponse;
     }
 }

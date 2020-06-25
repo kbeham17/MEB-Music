@@ -29,14 +29,11 @@ public class POSTTask extends AsyncTask<String, Integer, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        String jsonString = strings[0];
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(URL).openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setFixedLengthStreamingMode(jsonString.getBytes().length);
-            connection.getOutputStream().write(jsonString.getBytes());
             connection.getOutputStream().flush();
 
             int responseCode = connection.getResponseCode();

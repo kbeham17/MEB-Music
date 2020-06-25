@@ -12,8 +12,9 @@ public class DELETETask extends AsyncTask<String, Integer, String> {
 
     private String URL;
     private String jsonResponse;
+
     public DELETETask(String URL) {
-        this.URL=URL;
+        this.URL = URL;
     }
 
 

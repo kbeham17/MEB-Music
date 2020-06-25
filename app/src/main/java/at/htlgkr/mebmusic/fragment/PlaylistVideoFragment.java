@@ -1,8 +1,9 @@
 package at.htlgkr.mebmusic.fragment;
 
-
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.LightingColorFilter;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -12,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +29,7 @@ import com.google.api.services.youtube.model.Comment;
 import com.google.api.services.youtube.model.CommentSnippet;
 import com.google.api.services.youtube.model.CommentThread;
 import com.google.api.services.youtube.model.CommentThreadSnippet;
+import com.squareup.seismic.ShakeDetector;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,120 +38,78 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.actvities.CredentialSetter;
 import at.htlgkr.mebmusic.actvities.MainActivity;
-import at.htlgkr.mebmusic.adapter.SearchVideoAdapter;
-import at.htlgkr.mebmusic.thumbnail.MediumThumb;
-import at.htlgkr.mebmusic.R;
-import at.htlgkr.mebmusic.thumbnail.Thumbnail;
+import at.htlgkr.mebmusic.adapter.VideoAdapter;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
+import at.htlgkr.mebmusic.thumbnail.MediumThumb;
+import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.videos.Video;
 import at.htlgkr.mebmusic.videos.VideoSnippet;
 
 
-public class SearchFragment extends Fragment {
-
-    private com.google.api.services.youtube.YouTube mService;
-    private EditText et_search;
-    private Button btn_search;
-    private SearchVideoAdapter adapter;
-    private LinearLayoutManager manager;
-    private String order;
-    private List<Video> videoList = new ArrayList<>();
-    private String channelID;
+public class PlaylistVideoFragment extends Fragment implements com.squareup.seismic.ShakeDetector.Listener {
     private MainActivity mAct;
 
-    private static final int RQ_AUTHORIZATION = 1001;
+    private com.google.api.services.youtube.YouTube mService;
 
-    public SearchFragment() {
+    private View view;
+
+    private String id;
+
+    private VideoAdapter adapter;
+    private LinearLayoutManager manager;
+    private List<Video> videoList = new ArrayList<>();
+
+    private String channelID;
+
+    private static final int RQ_AUTHORIZATION = 2001;
+
+    public PlaylistVideoFragment() {
     }
 
-    public SearchFragment(String order, String channelID) {
-        this.order = order;
+    public PlaylistVideoFragment(String id, String channelID) {
+        this.id = id;
         this.channelID = channelID;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        et_search = view.findViewById(R.id.et_search);
-        btn_search = view.findViewById(R.id.btn_search);
-        RecyclerView rv = view.findViewById(R.id.recycler_search);
+        view = inflater.inflate(R.layout.fragment_playlist_video, container, false);
 
-        adapter = new SearchVideoAdapter(getContext(), videoList);
+        setUpBackButton(view);
+
+        RecyclerView rv = view.findViewById(R.id.recycler_playlistvideos);
+        adapter = new VideoAdapter(getContext(), videoList);
         manager = new LinearLayoutManager(getContext());
         rv.setAdapter(adapter);
         rv.setLayoutManager(manager);
 
         registerForContextMenu(rv);
 
-        btn_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!TextUtils.isEmpty(et_search.getText().toString())) {
-                    getJson(et_search.getText().toString());
-                } else {
-                    Toast.makeText(getContext(), "Search for a video", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        videoList.clear();
 
-        adapter.setOnVideoClickListener(new SearchVideoAdapter.OnVideoClickListener() {
+        intializeView(view);
+        getJson();
+
+        adapter.setOnVideoClickListener(new VideoAdapter.OnVideoClickListener() {
             @Override
             public void onVideoClick(int position) {
-                Intent intent = YouTubeIntents.createPlayVideoIntent(getContext(), videoList.get(position).getVideoID());
+                Intent intent = YouTubeIntents.createPlayPlaylistIntent(getContext(), id);
                 startActivity(intent);
             }
         });
 
+        SensorManager sensorManager = (SensorManager) mAct.getSystemService(Context.SENSOR_SERVICE);
+        ShakeDetector sd = new ShakeDetector(this);
+        sd.start(sensorManager);
+
         mService = CredentialSetter.getmService();
 
         return view;
-    }
-
-    private void getJson(String query) {
-        String url = YoutubeAPI.BASE + YoutubeAPI.SEARCH + YoutubeAPI.PART + YoutubeAPI.ORDER + order + YoutubeAPI.QUERY + query + YoutubeAPI.TYPE + YoutubeAPI.KEY;
-        GETTask getTask = new GETTask(url);
-        getTask.execute();
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        String toDoJson = getTask.getJsonResponse();
-        if (toDoJson != null) {
-            try {
-                String split = toDoJson.split("\"items\": ")[1];
-                //String[] itemsSplit = split.split("},");
-                JSONArray jsonarr = new JSONArray(split);
-
-                for (int i = 0; i < jsonarr.length(); i++) {
-                    JSONObject base = jsonarr.getJSONObject(i);
-
-                    JSONObject idObject = (JSONObject) base.get("id");
-                    String id = idObject.getString("videoId");
-
-                    JSONObject snippetObject = (JSONObject) base.get("snippet");
-
-                    JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
-
-                    JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
-
-                    VideoSnippet snippet = new VideoSnippet(snippetObject.getString("publishedAt"), snippetObject.getString("title"), snippetObject.getString("description"), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
-
-                    videoList.add(new Video(id, snippet));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -163,7 +122,7 @@ public class SearchFragment extends Fragment {
             ex.printStackTrace();
         }
 
-        if (item.getItemId() == R.id.context_search_video_details) {
+        if (item.getItemId() == R.id.context_playlistvideos_details) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             final int finalEntryID = entryID;
             Video video = videoList.get(entryID);
@@ -176,10 +135,9 @@ public class SearchFragment extends Fragment {
             dialog.setNeutralButton("Cancel", null);
             dialog.show().getWindow().getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
 
-
             return true;
         }
-        if (item.getItemId() == R.id.context_search_video_comment) {
+        if (item.getItemId() == R.id.context_playlistvideos_comment) {
 
             final int finalEntryID = entryID;
 
@@ -201,13 +159,27 @@ public class SearchFragment extends Fragment {
 
             return true;
         }
-        if (item.getItemId() == R.id.context_search_video_add) {
+        if (item.getItemId() == R.id.context_playlistvideos_delete) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             final int finalEntryID = entryID;
+
             Video video = videoList.get(entryID);
 
-            mAct.setPlaylistVideoAddFragment(video);
-        }
+            new DeleteVideoItem(mService, video.getPlaylistVideoId()).execute();
 
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            String name = videoList.get(entryID).getSnippet().getTitle();
+
+            videoList.remove(entryID);
+            adapter.notifyDataSetChanged();
+
+            Toast.makeText(getContext(), "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
+        }
 
         return super.onContextItemSelected(item);
     }
@@ -218,7 +190,7 @@ public class SearchFragment extends Fragment {
 
         Video video = videoList.get(entryID);
 
-        new SearchFragment.CommentVideoItem(mService, video.getVideoID(), comment).execute();
+        new CommentVideoItem(mService, video.getVideoID(), comment).execute();
 
         try {
             Thread.sleep(1000);
@@ -227,10 +199,14 @@ public class SearchFragment extends Fragment {
         }
     }
 
+    private void intializeView(View view) {
+        RecyclerView rv = view.findViewById(R.id.recycler_playlistvideos);
+    }
+
     private void handleDialogLike(String vidID) {
         String like = "like";
 
-        new SearchFragment.RateVideoTask(mService, like, vidID).execute();
+        new RateVideoTask(mService, like, vidID).execute();
 
         try {
             Thread.sleep(1000);
@@ -242,7 +218,7 @@ public class SearchFragment extends Fragment {
     private void handleDialogDislike(String vidID) {
         String dislike = "dislike";
 
-        new SearchFragment.RateVideoTask(mService, dislike, vidID).execute();
+        new RateVideoTask(mService, dislike, vidID).execute();
 
         try {
             Thread.sleep(1000);
@@ -250,6 +226,55 @@ public class SearchFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
+    private void setUpBackButton(View view) {
+        Button btnBack = view.findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAct.setPlaylistFragment();
+            }
+        });
+    }
+
+
+    private void getJson() {
+        String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLISTITEMS + YoutubeAPI.PART + YoutubeAPI.PLAYLISTID + id + YoutubeAPI.KEY;
+        GETTask getTask = new GETTask(url);
+        getTask.execute();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String toDoJson = getTask.getJsonResponse();
+        if (toDoJson != null) {
+            try {
+                String split = toDoJson.split("\"items\": ")[1];
+                JSONArray jsonarr = new JSONArray(split);
+
+                for (int i = 0; i < jsonarr.length(); i++) {
+                    JSONObject base = jsonarr.getJSONObject(i);
+                    String playlistVideoId = base.getString("id");
+                    JSONObject snippetObject = (JSONObject) base.get("snippet");
+                    JSONObject resourceIdObject = (JSONObject) snippetObject.get("resourceId");
+                    String id = resourceIdObject.get("videoId").toString();
+                    JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
+                    JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
+                    VideoSnippet snippet = new VideoSnippet(snippetObject.getString("publishedAt"), snippetObject.get("title").toString(), snippetObject.getString("description"), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
+
+
+                    videoList.add(new Video(id, playlistVideoId, snippet));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
 
     private class RateVideoTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.youtube.YouTube mService = null;
@@ -276,13 +301,11 @@ public class SearchFragment extends Fragment {
 
         private List<String> getDataFromApi() throws IOException {
             mService.videos().rate(vidID, rating).execute();
-
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -316,12 +339,12 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    private class AddVideoItem extends AsyncTask<Void, Void, List<String>> {
+    private class DeleteVideoItem extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.youtube.YouTube mService = null;
         private String vidID;
         private Exception mLastError = null;
 
-        AddVideoItem(com.google.api.services.youtube.YouTube mService, String vidID) {
+        DeleteVideoItem(com.google.api.services.youtube.YouTube mService, String vidID) {
             this.mService = mService;
             this.vidID = vidID;
         }
@@ -339,13 +362,11 @@ public class SearchFragment extends Fragment {
 
         private List<String> getDataFromApi() throws IOException {
             mService.playlistItems().delete(vidID).execute();
-
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -358,7 +379,6 @@ public class SearchFragment extends Fragment {
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
@@ -436,11 +456,11 @@ public class SearchFragment extends Fragment {
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
         protected void onCancelled() {
+
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
@@ -457,7 +477,21 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    public void setmAct(MainActivity mAct) {
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setMAct(MainActivity mAct) {
         this.mAct = mAct;
     }
+
+    //Sensor
+
+    @Override
+    public void hearShake() {
+        Intent intent = YouTubeIntents.createPlayPlaylistIntent(getContext(), id);
+        startActivity(intent);
+    }
+
+
 }

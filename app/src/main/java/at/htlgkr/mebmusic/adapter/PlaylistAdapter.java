@@ -8,16 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
-
-
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.playlist.Playlist;
 
@@ -67,6 +62,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(Menu.NONE, R.id.context_playlist_details, Menu.NONE, "Details");
             menu.add(Menu.NONE, R.id.context_playlist_bearbeiten, Menu.NONE, "Edit");
+            menu.add(Menu.NONE, R.id.context_playlist_delete, Menu.NONE, "Delete");
         }
 
 
@@ -75,8 +71,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int getCount = data.getPlaylistDetails().getItemCount();
             String getThumb = data.getSnippet().getThumbnail().getMedium().getUrl();
             String getDesc = data.getSnippet().getDescription();
-
-
 
             title.setText(getTitle);
             description.setText(getDesc);

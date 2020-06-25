@@ -9,10 +9,10 @@
 
     <TextView
         android:id="@+id/text_welcome"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="60dp"
-        android:layout_marginEnd="60dp"
         android:layout_marginBottom="600dp"
         android:fontFamily="@font/bold"
         android:text="Willkommen!"
@@ -27,9 +27,8 @@
         android:id="@+id/text_greet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="100dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginBottom="550dp"
         android:fontFamily="@font/light"
         android:text="Schön, dich wieder zu sehen!"
@@ -41,14 +40,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/googleSignIn"
+
+    <Button
+        android:id="@+id/mCallApiButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="180dp"
-        android:layout_marginEnd="200dp"
+        android:layout_marginRight="200dp"
         android:layout_marginBottom="420dp"
+        android:text="Login"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -11,8 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GETTask extends AsyncTask<String,Integer,String> {
-    //AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg
+public class GETTask extends AsyncTask<String, Integer, String> {
     String url;
     String jsonResponse = "";
     ArrayList<String> arrayList;
@@ -62,10 +61,9 @@ public class GETTask extends AsyncTask<String,Integer,String> {
             }
         }
         return sb.toString();
-
     }
 
-    public String getJsonResponse(){
+    public String getJsonResponse() {
         return jsonResponse;
     }
 
