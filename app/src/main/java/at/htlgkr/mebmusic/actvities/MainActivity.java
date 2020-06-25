@@ -60,10 +60,13 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
+
+import at.htlgkr.mebmusic.fragment.PlaylistVideoAddFragment;
 import at.htlgkr.mebmusic.fragment.PlaylistVideoFragment;
 import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
 import at.htlgkr.mebmusic.sensor.ShakeDetector;
+import at.htlgkr.mebmusic.videos.Video;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import com.google.android.youtube.player.YouTubeIntents;
@@ -77,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static String id;
 
     private PlaylistFragment playlistFragment = new PlaylistFragment("");
+    private PlaylistVideoAddFragment playlistVideoAddFragment;
     private ProfileFragment profileFragment = new ProfileFragment(null, null);
     private SearchFragment searchFragment = new SearchFragment();
 
@@ -93,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private GoogleAccountCredential mCredential;
 
     ProgressDialog mProgress;
+
+    private MainActivity mAct;
 
     private static final int RQ_RESULT_START_ACTIVITY = 1;
     private static final int RQ_ACCOUNT_PICKER = 1000;
@@ -180,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                             String order = prefs.getString("list_preference_order", "relevance");
                             searchFragment = new SearchFragment(order, chanelId);
+                            searchFragment.setmAct(mAct);
                             setFragment(searchFragment);
                             return true;
 
@@ -269,6 +276,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     public void setPlaylistFragment(){
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.frame_main, playlistFragment);
+        ft.commit();
+    }
+
+    public void setPlaylistVideoAddFragment(Video video){
+        String chanelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
+
+        if (chanelId.equals("")){
+            chanelId = "UCMnR3J-chev22dTqJEquFcg";
+        }
+
+        playlistVideoAddFragment = new PlaylistVideoAddFragment(chanelId, video);
+        playlistVideoAddFragment.setMAct(mAct);
+
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.frame_main, playlistVideoAddFragment);
+        ft.commit();
+    }
+
+    public void setSearchFragment(){
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_main, playlistFragment);
         ft.commit();

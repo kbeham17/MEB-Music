@@ -296,6 +296,8 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
             }
 
             CredentialSetter.setmService(mService);
+            String name = mCredential.getSelectedAccountName();
+            CredentialSetter.setName(name);
 
             finish();
         }
