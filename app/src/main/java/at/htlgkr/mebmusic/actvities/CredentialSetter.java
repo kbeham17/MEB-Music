@@ -5,6 +5,7 @@ import com.google.api.services.youtube.YouTube;
 
 public class CredentialSetter {
     public static com.google.api.services.youtube.YouTube mService;
+    public static String name;
 
     public static YouTube getmService() {
         return mService;
@@ -12,5 +13,13 @@ public class CredentialSetter {
 
     public static void setmService(YouTube mServicee) {
         mService = mServicee;
+    }
+
+    public static void setName(String namee){
+        name = namee;
+    }
+
+    public static String getName(){
+        return name;
     }
 }

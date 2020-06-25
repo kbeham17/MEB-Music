@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import at.htlgkr.mebmusic.actvities.CredentialSetter;
 import at.htlgkr.mebmusic.actvities.PreferenceActivity;
 import at.htlgkr.mebmusic.R;
 
@@ -60,12 +61,12 @@ public class ProfileFragment extends Fragment {
     }
 
     public void setupProfile(View view) {
-        if (profilePictureUrl != null && name != null) {
+
             textGoogleName = view.findViewById(R.id.text_google_name);
             googleProfilePicture = view.findViewById(R.id.iv_google_profile_picture);
 
-            textGoogleName.setText(name);
-            Picasso.get()
+            textGoogleName.setText(CredentialSetter.getName());
+            /*Picasso.get()
                     .load(profilePictureUrl)
                     .placeholder(R.mipmap.ic_launcher)
                     .fit()
@@ -79,9 +80,9 @@ public class ProfileFragment extends Fragment {
                         public void onError(Exception e) {
                             e.printStackTrace();
                         }
-                    });
+                    });*/
 
-        }
+
     }
 
     /*public static String getName() {
