@@ -15,7 +15,6 @@ public class Thumbnail {
         return medium;
     }
 
-
     public void setMedium(MediumThumb medium) {
         this.medium = medium;
     }

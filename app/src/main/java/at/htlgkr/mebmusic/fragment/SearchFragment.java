@@ -1,6 +1,7 @@
 package at.htlgkr.mebmusic.fragment;
 
 
+import android.content.Intent;
 import android.graphics.LightingColorFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeIntents;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.youtube.model.Comment;
@@ -40,15 +42,12 @@ import at.htlgkr.mebmusic.adapter.SearchVideoAdapter;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
-import at.htlgkr.mebmusic.adapter.VideoAdapter;
 import at.htlgkr.mebmusic.apitasks.GETTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
 import at.htlgkr.mebmusic.videos.Video;
 import at.htlgkr.mebmusic.videos.VideoSnippet;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class SearchFragment extends Fragment {
 
     private com.google.api.services.youtube.YouTube mService;
@@ -60,13 +59,9 @@ public class SearchFragment extends Fragment {
     private List<Video> videoList = new ArrayList<>();
     private String channelID;
 
-    private static final int RQ_ACCOUNT_PICKER = 1000;
     private static final int RQ_AUTHORIZATION = 1001;
-    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     public SearchFragment() {
-
     }
 
     public SearchFragment(String order, String channelID) {
@@ -93,11 +88,19 @@ public class SearchFragment extends Fragment {
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!TextUtils.isEmpty(et_search.getText().toString())){
+                if (!TextUtils.isEmpty(et_search.getText().toString())) {
                     getJson(et_search.getText().toString());
-                }else{
+                } else {
                     Toast.makeText(getContext(), "Search for a video", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        adapter.setOnVideoClickListener(new SearchVideoAdapter.OnVideoClickListener() {
+            @Override
+            public void onVideoClick(int position) {
+                Intent intent = YouTubeIntents.createPlayVideoIntent(getContext(), videoList.get(position).getVideoID());
+                startActivity(intent);
             }
         });
 
@@ -107,8 +110,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void getJson(String query) {
-        String url = YoutubeAPI.BASE + YoutubeAPI.SEARCH  + YoutubeAPI.PART + YoutubeAPI.ORDER + order + YoutubeAPI.QUERY + query + YoutubeAPI.TYPE+ YoutubeAPI.KEY;
-        //String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&order=date&q=yung%20hurn&type=video"+ YoutubeAPI.KEY;
+        String url = YoutubeAPI.BASE + YoutubeAPI.SEARCH + YoutubeAPI.PART + YoutubeAPI.ORDER + order + YoutubeAPI.QUERY + query + YoutubeAPI.TYPE + YoutubeAPI.KEY;
         GETTask getTask = new GETTask(url);
         getTask.execute();
 
@@ -119,13 +121,13 @@ public class SearchFragment extends Fragment {
         }
 
         String toDoJson = getTask.getJsonResponse();
-        if(toDoJson != null) {
+        if (toDoJson != null) {
             try {
-                String split = toDoJson.split("\"items\": " )[1];
+                String split = toDoJson.split("\"items\": ")[1];
                 //String[] itemsSplit = split.split("},");
                 JSONArray jsonarr = new JSONArray(split);
 
-                for(int i = 0; i< jsonarr.length(); i++){
+                for (int i = 0; i < jsonarr.length(); i++) {
                     JSONObject base = jsonarr.getJSONObject(i);
 
                     JSONObject idObject = (JSONObject) base.get("id");
@@ -141,7 +143,7 @@ public class SearchFragment extends Fragment {
 
                     videoList.add(new Video(id, snippet));
                 }
-            }catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -153,14 +155,13 @@ public class SearchFragment extends Fragment {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         int entryID = -1;
 
-        try{
+        try {
             entryID = adapter.getPosition();
-//            entryID = item.getItemId();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        if(item.getItemId() == R.id.context_search_video_details){
+        if (item.getItemId() == R.id.context_search_video_details) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             final int finalEntryID = entryID;
             Video video = videoList.get(entryID);
@@ -176,7 +177,7 @@ public class SearchFragment extends Fragment {
 
             return true;
         }
-        if(item.getItemId() == R.id.context_search_video_comment){
+        if (item.getItemId() == R.id.context_search_video_comment) {
 
             final int finalEntryID = entryID;
 
@@ -193,43 +194,23 @@ public class SearchFragment extends Fragment {
                     .getWindow()
                     .getDecorView()
                     .getBackground()
-                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));;
+                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
+            ;
 
             return true;
         }
-        if(item.getItemId() == R.id.context_search_video_add){
+        if (item.getItemId() == R.id.context_search_video_add) {
 
 
+            mAct.setPlaylistVideoAddFragment(video);
 
-
-
-
-            /*AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            final int finalEntryID = entryID;
-
-            Video video = videoList.get(entryID);
-
-            new PlaylistVideoFragment.DeleteVideoItem(mService, video.getPlaylistVideoId()).execute();
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            String name = videoList.get(entryID).getSnippet().getTitle();
-
-            videoList.remove(entryID);
-            adapter.notifyDataSetChanged();
-
-            Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();*/
         }
 
 
         return super.onContextItemSelected(item);
     }
 
-    private void handleDialogComment(View vDialog, int entryID){
+    private void handleDialogComment(View vDialog, int entryID) {
         EditText editComment = vDialog.findViewById(R.id.dialog_playlistvideos_comment);
         String comment = editComment.getText().toString();
 
@@ -244,7 +225,7 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    private void handleDialogLike(String vidID){
+    private void handleDialogLike(String vidID) {
         String like = "like";
 
         new SearchFragment.RateVideoTask(mService, like, vidID).execute();
@@ -256,7 +237,7 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    private void handleDialogDislike(String vidID){
+    private void handleDialogDislike(String vidID) {
         String dislike = "dislike";
 
         new SearchFragment.RateVideoTask(mService, dislike, vidID).execute();
@@ -307,12 +288,11 @@ public class SearchFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
@@ -320,10 +300,6 @@ public class SearchFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
@@ -339,21 +315,21 @@ public class SearchFragment extends Fragment {
     }
 
     private class AddVideoItem extends AsyncTask<Void, Void, List<String>> {
-                    private com.google.api.services.youtube.YouTube mService = null;
-                    private String vidID;
-                    private Exception mLastError = null;
+        private com.google.api.services.youtube.YouTube mService = null;
+        private String vidID;
+        private Exception mLastError = null;
 
-                    AddVideoItem(com.google.api.services.youtube.YouTube mService, String vidID) {
-                        this.mService = mService;
-                        this.vidID = vidID;
-                    }
+        AddVideoItem(com.google.api.services.youtube.YouTube mService, String vidID) {
+            this.mService = mService;
+            this.vidID = vidID;
+        }
 
-                    @Override
-                    protected List<String> doInBackground(Void... params) {
-                        try {
-                            return getDataFromApi();
-                        } catch (Exception e) {
-                            mLastError = e;
+        @Override
+        protected List<String> doInBackground(Void... params) {
+            try {
+                return getDataFromApi();
+            } catch (Exception e) {
+                mLastError = e;
                 cancel(true);
                 return null;
             }
@@ -375,7 +351,7 @@ public class SearchFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
@@ -388,10 +364,6 @@ public class SearchFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
@@ -457,7 +429,7 @@ public class SearchFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
@@ -467,13 +439,8 @@ public class SearchFragment extends Fragment {
 
         @Override
         protected void onCancelled() {
-
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),

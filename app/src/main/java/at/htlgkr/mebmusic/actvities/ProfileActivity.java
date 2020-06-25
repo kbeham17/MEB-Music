@@ -1,9 +1,7 @@
 package at.htlgkr.mebmusic.actvities;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-
 import at.htlgkr.mebmusic.R;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -13,5 +11,4 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
     }
-
 }

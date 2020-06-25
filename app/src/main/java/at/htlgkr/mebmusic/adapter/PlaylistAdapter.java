@@ -8,16 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
-
-
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.playlist.Playlist;
 
@@ -76,8 +71,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int getCount = data.getPlaylistDetails().getItemCount();
             String getThumb = data.getSnippet().getThumbnail().getMedium().getUrl();
             String getDesc = data.getSnippet().getDescription();
-
-
 
             title.setText(getTitle);
             description.setText(getDesc);

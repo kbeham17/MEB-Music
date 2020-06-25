@@ -4,16 +4,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
-
 import com.google.api.services.youtube.YouTubeScopes;
-
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
@@ -26,36 +23,24 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.api.services.youtube.model.Channel;
-import com.google.api.services.youtube.model.ChannelListResponse;
+
 
 import at.htlgkr.mebmusic.R;
 
 public class StartActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks {
 
-    SignInButton signInButton;
     public GoogleAccountCredential mCredential;
 
     private Button mCallApiButton;
-    private TextView mOutputText;
-    private GoogleApiClient googleApiClient;
 
     public static final int RQ_SIGN_IN = 1;
     public static final int RQ_ACCOUNT_PICKER = 2000;
@@ -65,7 +50,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
     private static final String BUTTON_TEXT = "Call YouTube Data API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = { YouTubeScopes.YOUTUBE_FORCE_SSL };
+    private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_FORCE_SSL};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,35 +60,16 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         mCallApiButton = findViewById(R.id.mCallApiButton);
 
         mCallApiButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            @Override
+            public void onClick(View view) {
                 getResultsFromApi();
             }
         });
 
         mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
-
-        /*GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        googleApiClient = new GoogleApiClient
-                .Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        signInButton = findViewById(R.id.googleSignIn);
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-                startActivityForResult(intent, RQ_SIGN_IN);
-            }
-        });*/
     }
 
-    private void getResultsFromApi(){
+    private void getResultsFromApi() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -111,7 +77,6 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
         } else if (!isDeviceOnline()) {
             Toast.makeText(this, "No network connection available.", Toast.LENGTH_LONG);
         } else {
-
             new MakeRequestTask(mCredential).execute();
         }
     }
@@ -126,13 +91,11 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                 mCredential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
-                // Start a dialog from which the user can choose an account
                 startActivityForResult(
                         mCredential.newChooseAccountIntent(),
                         RQ_ACCOUNT_PICKER);
             }
         } else {
-            // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
                     "This app needs to access your Google account (via Contacts).",
@@ -145,7 +108,7 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case RQ_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
                     System.out.println(
@@ -190,22 +153,18 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        System.out.println("FEHLERFEHLERFEHLER");
+        System.out.println("Connection Failed");
     }
 
     private boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this);
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
     private void acquireGooglePlayServices() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
@@ -223,12 +182,10 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-
     }
 
     private boolean isDeviceOnline() {
@@ -253,36 +210,15 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
 
         @Override
         protected List<String> doInBackground(Void... params) {
-            /*try {
-                return getDataFromApi();
-            } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-                return null;
-            }*/
             return null;
         }
 
         private List<String> getDataFromApi() throws IOException {
-            //mService.playlists().delete("PL5I2c6CPyev5xReL1Dk3E90FY-gSk3CMv").execute();
-
-            /*List<String> channelInfo = new ArrayList<String>();
-            ChannelListResponse result = mService.channels().list("snippet,contentDetails,statistics")
-                    .setForUsername(mCredential.getSelectedAccountName())
-                    .execute();
-            List<Channel> channels = result.getItems();
-            if (channels != null) {
-                Channel channel = channels.get(0);
-                channelInfo.add("This channel's ID is " + channel.getId() + ". " +
-                        "Its title is '" + channel.getSnippet().getTitle() + ", " +
-                        "and it has " + channel.getStatistics().getViewCount() + " views.");
-            }*/
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -321,6 +257,6 @@ public class StartActivity extends AppCompatActivity implements GoogleApiClient.
                 System.out.println("Request cancelled.");
             }
         }
-        }
     }
+}
 

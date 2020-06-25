@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MEBMusic</string>
+    <string name="app_name">MEB</string>
     <string name="channel_name">MyNotificationChannel</string>
     <string name="channel_description">This is a very intuitive Notification Channel....</string>
 </resources>

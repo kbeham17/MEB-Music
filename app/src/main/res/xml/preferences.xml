@@ -11,6 +11,6 @@
         android:entries="@array/orderBy"
         android:entryValues="@array/orderBy"
         android:key="list_preference_order"
-        android:title="List preference" />
+        android:title="Search preference" />
 </PreferenceCategory>
 </PreferenceScreen>

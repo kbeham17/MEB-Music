@@ -11,9 +11,10 @@ import java.net.URL;
 
 public class POSTTask extends AsyncTask<String, Integer, String> {
     String URL;
-    String jsonResponse="";
+    String jsonResponse = "";
+
     public POSTTask(String URL) {
-        this.URL=URL;
+        this.URL = URL;
     }
 
     @Override
@@ -28,14 +29,11 @@ public class POSTTask extends AsyncTask<String, Integer, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        //String jsonString = strings[0];
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(URL).openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
-//            connection.setFixedLengthStreamingMode(jsonString.getBytes().length);
-//            connection.getOutputStream().write(jsonString.getBytes());
             connection.getOutputStream().flush();
 
             int responseCode = connection.getResponseCode();
@@ -56,14 +54,13 @@ public class POSTTask extends AsyncTask<String, Integer, String> {
     private String readResponseStream(BufferedReader reader) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         String line = "";
-        while ((line=reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             stringBuilder.append(line);
         }
         return stringBuilder.toString();
     }
 
-    public String getJsonResponse()
-    {
+    public String getJsonResponse() {
         return jsonResponse;
     }
 }

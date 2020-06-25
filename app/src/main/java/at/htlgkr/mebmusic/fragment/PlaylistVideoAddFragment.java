@@ -12,11 +12,13 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemSnippet;
+import com.google.api.services.youtube.model.PlaylistStatus;
 import com.google.api.services.youtube.model.ResourceId;
 
 import org.json.JSONArray;
@@ -45,11 +47,7 @@ public class PlaylistVideoAddFragment extends Fragment {
     private static final String KIND = "youtube#video";
     private String CHANNELID;
 
-    private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
-    private static final int RQ_ACCOUNT_PICKER = 1000;
     private static final int RQ_AUTHORIZATION = 1001;
-    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     private List<Playlist> playlistList = new ArrayList<>();
     private Video video;
@@ -58,12 +56,12 @@ public class PlaylistVideoAddFragment extends Fragment {
 
     private PlaylistVideoAddAdapter mAdapt;
     private ListView lv;
-//test123
-    public PlaylistVideoAddFragment(){
+
+    public PlaylistVideoAddFragment() {
 
     }
 
-    public PlaylistVideoAddFragment(String CHANNELID, Video video){
+    public PlaylistVideoAddFragment(String CHANNELID, Video video) {
         this.video = video;
         this.CHANNELID = CHANNELID;
     }
@@ -95,7 +93,7 @@ public class PlaylistVideoAddFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Playlist playlist = playlistList.get(i);
 
-                if(playlist.getId().equals("-1")){
+                if (playlist.getId().equals("-1")) {
                     new CreatePlaylistTask(mService, playlist).execute();
 
                     try {
@@ -103,7 +101,9 @@ public class PlaylistVideoAddFragment extends Fragment {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-//                    mAct.setSearchFragment();
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.playlistaddlayout, new PlaylistFragment());
+                    fragmentTransaction.commit();
                 } else {
                     new AddPlaylistVideo(mService, playlist, video).execute();
 
@@ -112,7 +112,9 @@ public class PlaylistVideoAddFragment extends Fragment {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-//                    mAct.setSearchFragment();
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.playlistaddlayout, new PlaylistFragment());
+                    fragmentTransaction.commit();
                 }
             }
         });
@@ -120,7 +122,7 @@ public class PlaylistVideoAddFragment extends Fragment {
         return view;
     }
 
-    public void setMAct(MainActivity mAct){
+    public void setMAct(MainActivity mAct) {
         this.mAct = mAct;
     }
 
@@ -139,7 +141,6 @@ public class PlaylistVideoAddFragment extends Fragment {
         if (toDoJson != null) {
             try {
                 String split = toDoJson.split("\"items\": ")[1];
-                //String[] itemsSplit = split.split("},");
                 JSONArray jsonarr = new JSONArray(split);
 
                 for (int i = 0; i < jsonarr.length(); i++) {
@@ -190,7 +191,12 @@ public class PlaylistVideoAddFragment extends Fragment {
             ytPlaylistSnippet.setTitle("neue Playlist");
             ytPlaylist.setSnippet(ytPlaylistSnippet);
 
-            mService.playlists().insert("snippet", ytPlaylist).execute();
+            PlaylistStatus playlistStatus = new PlaylistStatus();
+            playlistStatus.setPrivacyStatus("public");
+
+            ytPlaylist.setStatus(playlistStatus);
+
+            mService.playlists().insert("snippet, status", ytPlaylist).execute();
 
             return null;
         }
@@ -205,7 +211,7 @@ public class PlaylistVideoAddFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
@@ -218,9 +224,6 @@ public class PlaylistVideoAddFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
 
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
@@ -286,12 +289,11 @@ public class PlaylistVideoAddFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
@@ -299,9 +301,6 @@ public class PlaylistVideoAddFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
 
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(

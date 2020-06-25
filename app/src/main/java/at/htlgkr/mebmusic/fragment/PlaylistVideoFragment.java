@@ -36,13 +36,9 @@ import java.util.List;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.actvities.CredentialSetter;
 import at.htlgkr.mebmusic.actvities.MainActivity;
-import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
 import at.htlgkr.mebmusic.adapter.VideoAdapter;
-import at.htlgkr.mebmusic.apitasks.DELETETask;
 import at.htlgkr.mebmusic.apitasks.GETTask;
-import at.htlgkr.mebmusic.apitasks.POSTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
-import at.htlgkr.mebmusic.playlist.Playlist;
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.videos.Video;
@@ -52,7 +48,6 @@ import at.htlgkr.mebmusic.videos.VideoSnippet;
 public class PlaylistVideoFragment extends Fragment {
 
     private MainActivity mAct;
-    //private Fragment backFragmentPlaylist;
 
     private com.google.api.services.youtube.YouTube mService;
 
@@ -63,18 +58,15 @@ public class PlaylistVideoFragment extends Fragment {
     private VideoAdapter adapter;
     private LinearLayoutManager manager;
     private List<Video> videoList = new ArrayList<>();
-    Bundle extra;
 
     private String channelID;
 
-    private static final int RQ_ACCOUNT_PICKER = 1000;
     private static final int RQ_AUTHORIZATION = 2001;
-    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
-    public PlaylistVideoFragment() {}
+    public PlaylistVideoFragment() {
+    }
 
-    public PlaylistVideoFragment(String id, String channelID){
+    public PlaylistVideoFragment(String id, String channelID) {
         this.id = id;
         this.channelID = channelID;
     }
@@ -127,14 +119,13 @@ public class PlaylistVideoFragment extends Fragment {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         int entryID = -1;
 
-        try{
+        try {
             entryID = adapter.getPosition();
-//            entryID = item.getItemId();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        if(item.getItemId() == R.id.context_playlistvideos_details){
+        if (item.getItemId() == R.id.context_playlistvideos_details) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             final int finalEntryID = entryID;
             Video video = videoList.get(entryID);
@@ -143,29 +134,13 @@ public class PlaylistVideoFragment extends Fragment {
 
             dialog.setMessage("Title: " + video.getSnippet().getTitle().toString() + "\nDescription: " + video.getSnippet().getDescription() + "\nPublished At: " + video.getSnippet().getPublishedAt());
             dialog.setPositiveButton("Like", ((vDialog, which) -> handleDialogLike(video.getVideoID())));
-                    dialog.setNegativeButton("Dislike", ((vDialog, which) -> handleDialogDislike(video.getVideoID())));
-                    dialog.setNeutralButton("Cancel", null);
+            dialog.setNegativeButton("Dislike", ((vDialog, which) -> handleDialogDislike(video.getVideoID())));
+            dialog.setNeutralButton("Cancel", null);
             dialog.show().getWindow().getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
-
-
-   /*         final View vDialog = getLayoutInflater().inflate(R.layout.dialog_, null);
-
-            new AlertDialog.Builder(getContext())
-                    .setCancelable(true)
-                    .setView(vDialog)
-                    .setMessage("Title: " + video.getSnippet().getTitle().toString() + "\nDescription: " + video.getSnippet().getDescription() + "\nPublished At: " + video.getSnippet().getPublishedAt())
-                    .setPositiveButton("Like", ((dialog, which) -> handleDialogLike(vDialog, finalEntryID)))
-                    .setNegativeButton("Dislike", ((dialog, which) -> handleDialogDislike(vDialog, finalEntryID)))
-                    .setNeutralButton("Cancel", null)
-                    .show()
-                    .getWindow()
-                    .getDecorView()
-                    .getBackground()
-                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));*/
 
             return true;
         }
-        if(item.getItemId() == R.id.context_playlistvideos_comment){
+        if (item.getItemId() == R.id.context_playlistvideos_comment) {
 
             final int finalEntryID = entryID;
 
@@ -182,13 +157,12 @@ public class PlaylistVideoFragment extends Fragment {
                     .getWindow()
                     .getDecorView()
                     .getBackground()
-                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));;
+                    .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
+            ;
 
             return true;
         }
-        if(item.getItemId() == R.id.context_playlistvideos_delete){
-            //GEHT NED WEIL FALSCHE ID
-
+        if (item.getItemId() == R.id.context_playlistvideos_delete) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             final int finalEntryID = entryID;
 
@@ -207,14 +181,13 @@ public class PlaylistVideoFragment extends Fragment {
             videoList.remove(entryID);
             adapter.notifyDataSetChanged();
 
-            Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
         }
-
 
         return super.onContextItemSelected(item);
     }
 
-    private void handleDialogComment(View vDialog, int entryID){
+    private void handleDialogComment(View vDialog, int entryID) {
         EditText editComment = vDialog.findViewById(R.id.dialog_playlistvideos_comment);
         String comment = editComment.getText().toString();
 
@@ -229,11 +202,11 @@ public class PlaylistVideoFragment extends Fragment {
         }
     }
 
-    private void intializeView(View view){
+    private void intializeView(View view) {
         RecyclerView rv = view.findViewById(R.id.recycler_playlistvideos);
     }
 
-    private void handleDialogLike(String vidID){
+    private void handleDialogLike(String vidID) {
         String like = "like";
 
         new RateVideoTask(mService, like, vidID).execute();
@@ -245,7 +218,7 @@ public class PlaylistVideoFragment extends Fragment {
         }
     }
 
-    private void handleDialogDislike(String vidID){
+    private void handleDialogDislike(String vidID) {
         String dislike = "dislike";
 
         new RateVideoTask(mService, dislike, vidID).execute();
@@ -257,7 +230,7 @@ public class PlaylistVideoFragment extends Fragment {
         }
     }
 
-    private void setUpBackButton(View view){
+    private void setUpBackButton(View view) {
         Button btnBack = view.findViewById(R.id.btn_back);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -267,13 +240,6 @@ public class PlaylistVideoFragment extends Fragment {
         });
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setMAct(MainActivity mAct){
-        this.mAct = mAct;
-    }
 
     private void getJson() {
         String url = YoutubeAPI.BASE + YoutubeAPI.PLAYLISTITEMS + YoutubeAPI.PART + YoutubeAPI.PLAYLISTID + id + YoutubeAPI.KEY;
@@ -290,7 +256,6 @@ public class PlaylistVideoFragment extends Fragment {
         if (toDoJson != null) {
             try {
                 String split = toDoJson.split("\"items\": ")[1];
-                //String[] itemsSplit = split.split("},");
                 JSONArray jsonarr = new JSONArray(split);
 
                 for (int i = 0; i < jsonarr.length(); i++) {
@@ -301,15 +266,14 @@ public class PlaylistVideoFragment extends Fragment {
                     String id = resourceIdObject.get("videoId").toString();
                     JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
                     JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
-                    VideoSnippet snippet = new VideoSnippet(snippetObject.getString("publishedAt"), snippetObject.get("title").toString(),snippetObject.getString("description"), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
+                    VideoSnippet snippet = new VideoSnippet(snippetObject.getString("publishedAt"), snippetObject.get("title").toString(), snippetObject.getString("description"), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())));
 
 
-                    videoList.add(new Video(id,playlistVideoId, snippet));
+                    videoList.add(new Video(id, playlistVideoId, snippet));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
         adapter.notifyDataSetChanged();
     }
@@ -339,13 +303,11 @@ public class PlaylistVideoFragment extends Fragment {
 
         private List<String> getDataFromApi() throws IOException {
             mService.videos().rate(vidID, rating).execute();
-
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -353,12 +315,11 @@ public class PlaylistVideoFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
@@ -366,10 +327,6 @@ public class PlaylistVideoFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
@@ -407,13 +364,11 @@ public class PlaylistVideoFragment extends Fragment {
 
         private List<String> getDataFromApi() throws IOException {
             mService.playlistItems().delete(vidID).execute();
-
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -421,12 +376,11 @@ public class PlaylistVideoFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
@@ -434,10 +388,6 @@ public class PlaylistVideoFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
@@ -503,12 +453,11 @@ public class PlaylistVideoFragment extends Fragment {
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
@@ -516,10 +465,6 @@ public class PlaylistVideoFragment extends Fragment {
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),

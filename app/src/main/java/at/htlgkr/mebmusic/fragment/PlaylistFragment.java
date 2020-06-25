@@ -1,8 +1,6 @@
 package at.htlgkr.mebmusic.fragment;
 
 
-import android.app.Dialog;
-import android.content.Context;
 import android.graphics.LightingColorFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,14 +19,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,26 +31,20 @@ import java.util.List;
 
 import at.htlgkr.mebmusic.actvities.CredentialSetter;
 import at.htlgkr.mebmusic.actvities.MainActivity;
-import at.htlgkr.mebmusic.actvities.StartActivity;
-
 import at.htlgkr.mebmusic.thumbnail.MediumThumb;
 import at.htlgkr.mebmusic.thumbnail.Thumbnail;
 import at.htlgkr.mebmusic.apitasks.GETTask;
-import at.htlgkr.mebmusic.apitasks.PUTTask;
 import at.htlgkr.mebmusic.apitasks.YoutubeAPI;
 import at.htlgkr.mebmusic.playlist.Playlist;
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.adapter.PlaylistAdapter;
 import at.htlgkr.mebmusic.playlist.PlaylistDetails;
 import at.htlgkr.mebmusic.playlist.PlaylistSnippet;
-/*import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;*/
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PlaylistFragment extends Fragment{
+public class PlaylistFragment extends Fragment {
 
     private com.google.api.services.youtube.YouTube mService;
     private PlaylistAdapter adapter;
@@ -66,11 +52,7 @@ public class PlaylistFragment extends Fragment{
     private List<Playlist> playlistList = new ArrayList<>();
     private String CHANNELID;
     private MainActivity mAct;
-    private int RQ_PLAYLISTVIDEO_ACTIVITY = 111;
-    private static final int RQ_ACCOUNT_PICKER = 1000;
     private static final int RQ_AUTHORIZATION = 2001;
-    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     public PlaylistFragment(String channelId) {
         this.CHANNELID = channelId;
@@ -79,7 +61,7 @@ public class PlaylistFragment extends Fragment{
     public PlaylistFragment() {
     }
 
-    public void setMAct(MainActivity mAct){
+    public void setMAct(MainActivity mAct) {
         this.mAct = mAct;
     }
 
@@ -100,7 +82,6 @@ public class PlaylistFragment extends Fragment{
 
         registerForContextMenu(rv);
 
-        Context ctx = this.getContext();
 
         adapter.setOnPlaylistClickListener(new PlaylistAdapter.OnPlaylistClickListener() {
             @Override
@@ -121,32 +102,17 @@ public class PlaylistFragment extends Fragment{
     }
 
 
-
-    /*@Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-
-        int viewId = v.getId();
-        if (viewId == R.id.recycler_playlist) {
-            getActivity().getMenuInflater().inflate(R.menu.context_menu_playlist, menu);
-        }
-
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }*/
-
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        //AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        //int entryID = info.position;
-
         int entryID = -1;
 
-        try{
+        try {
             entryID = adapter.getPosition();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        if(item.getItemId() == R.id.context_playlist_bearbeiten){
+        if (item.getItemId() == R.id.context_playlist_bearbeiten) {
 
             final int finalEntryID = entryID;
 
@@ -166,10 +132,7 @@ public class PlaylistFragment extends Fragment{
                     .setColorFilter(new LightingColorFilter(0xFF000000, 0xFF36393F));
             return true;
         }
-        if(item.getItemId() == R.id.context_playlist_details){
-
-
-
+        if (item.getItemId() == R.id.context_playlist_details) {
             Playlist playlist = playlistList.get(entryID);
             AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
@@ -179,7 +142,7 @@ public class PlaylistFragment extends Fragment{
 
             return true;
         }
-        if(item.getItemId() == R.id.context_playlist_delete){
+        if (item.getItemId() == R.id.context_playlist_delete) {
 
             Playlist playlist = playlistList.get(entryID);
 
@@ -196,14 +159,13 @@ public class PlaylistFragment extends Fragment{
             playlistList.remove(entryID);
             adapter.notifyDataSetChanged();
 
-            Toast.makeText(getContext() , "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
-
+            Toast.makeText(getContext(), "Item " + name + " has been removed.", Toast.LENGTH_LONG).show();
         }
 
         return super.onContextItemSelected(item);
     }
 
-    private void setUpDialog(View vDialog, int entryID){
+    private void setUpDialog(View vDialog, int entryID) {
         EditText editDialogTitle = vDialog.findViewById(R.id.dialog_playlist_title);
         EditText editDialogDescription = vDialog.findViewById(R.id.dialog_playlist_description);
         TextView textDialogTitle = vDialog.findViewById(R.id.dialog_playlist_dialogtitle);
@@ -215,7 +177,7 @@ public class PlaylistFragment extends Fragment{
         editDialogDescription.setText(playlist.getSnippet().getDescription());
     }
 
-    private void handleDialog(View vDialog, int entryID){
+    private void handleDialog(View vDialog, int entryID) {
         EditText editDialogTitle = vDialog.findViewById(R.id.dialog_playlist_title);
         EditText editDialogDescription = vDialog.findViewById(R.id.dialog_playlist_description);
 
@@ -232,39 +194,6 @@ public class PlaylistFragment extends Fragment{
             e.printStackTrace();
         }
 
-        /*String jsonRequest = "{\"id\":\""+ playlist.getId() +"\",\"snippet\":{\"title\":\""+ newTitle+"\",\"description\":\""+ newDesc+"\"}}";
-        PUTTask putTask = new PUTTask(YoutubeAPI.BASE + YoutubeAPI.PLAYLIST + YoutubeAPI.PART + YoutubeAPI.KEY);
-        putTask.execute(jsonRequest);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        String jsonResponse = putTask.getJsonResponse();
-
-        if (jsonResponse != null) {
-            try {
-                //JSONObject jsonObject = new JSONObject(jsonResponse);
-                //String split = jsonResponse.split("\"items\": ")[1];
-                //String[] itemsSplit = split.split("},");
-                //JSONArray jsonarr = new JSONArray(jsonResponse);
-                //JSONObject base = jsonarr.getJSONObject(0);
-
-                JSONObject base = new JSONObject(jsonResponse);
-                String id = base.get("id").toString();
-                JSONObject snippetObject = (JSONObject) base.get("snippet");
-                JSONObject thumbnailObject = (JSONObject) snippetObject.get("thumbnails");
-                JSONObject mediumObject = (JSONObject) thumbnailObject.get("medium");
-                PlaylistSnippet snippet = new PlaylistSnippet(snippetObject.get("title").toString(), new Thumbnail(new MediumThumb(mediumObject.get("url").toString())), snippetObject.getString("description"));
-
-                playlist = new Playlist(id, snippet, playlistList.get(entryID).getPlaylistDetails());
-
-                playlistList.set(entryID, playlist);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }*/
         adapter.notifyDataSetChanged();
     }
 
@@ -283,7 +212,6 @@ public class PlaylistFragment extends Fragment{
         if (toDoJson != null) {
             try {
                 String split = toDoJson.split("\"items\": ")[1];
-                //String[] itemsSplit = split.split("},");
                 JSONArray jsonarr = new JSONArray(split);
 
                 for (int i = 0; i < jsonarr.length(); i++) {
@@ -301,20 +229,9 @@ public class PlaylistFragment extends Fragment{
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
         adapter.notifyDataSetChanged();
     }
-
-    /*public void showGooglePlayServicesAvailabilityErrorDialog(
-            final int connectionStatusCode) {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog = apiAvailability.getErrorDialog(
-                PlaylistFragment.this,
-                connectionStatusCode,
-                RQ_GOOGLE_PLAY_SERVICES);
-        dialog.show();
-    }*/
 
     private class DeletePlaylistTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.youtube.YouTube mService = null;
@@ -345,7 +262,6 @@ public class PlaylistFragment extends Fragment{
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -353,30 +269,25 @@ public class PlaylistFragment extends Fragment{
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
             CredentialSetter.setmService(mService);
-
         }
 
         @Override
         protected void onCancelled() {
-
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-                    System.out.println("BLALBALBLALBL");
+
+                    System.out.println("Service not Available");
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             RQ_AUTHORIZATION);
                 } else {
-                    System.out.println("The following error occurred:\n"
-                            + mLastError.getMessage());
+                    System.out.println("The following error occurred:\n" + mLastError.getMessage());
                 }
             } else {
                 System.out.println("Request cancelled.");
@@ -425,7 +336,6 @@ public class PlaylistFragment extends Fragment{
 
         @Override
         protected void onPreExecute() {
-
         }
 
         @Override
@@ -433,7 +343,7 @@ public class PlaylistFragment extends Fragment{
             if (output == null || output.size() == 0) {
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                for(String s : output){
+                for (String s : output) {
                     System.out.println(s);
                 }
             }
@@ -446,10 +356,8 @@ public class PlaylistFragment extends Fragment{
 
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    /*showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());*/
-                    System.out.println("BLALBALBLALBL");
+
+                    System.out.println("Service not Available");
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
@@ -463,30 +371,4 @@ public class PlaylistFragment extends Fragment{
             }
         }
     }
-
 }
-
-
-
-
-//        Call<ModelPlaylist> data = YoutubeAPI.getPlaylistVideo().getYT("https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg");
-//        data.enqueue(new Callback<ModelPlaylist>() {
-//            @Override
-//            public void onResponse(Call<ModelPlaylist> call, Response<ModelPlaylist> response) {
-////                if(response.errorBody() != null){
-////                    System.out.println(response.errorBody().toString());
-////                    Log.w(TAG, "onResponse: "+response.errorBody());
-////                }
-////                else{
-////                    ModelPlaylist mp = response.body();
-////                    playlistList.addAll(mp.getPlaylistItems());
-////                    adapter.notifyDataSetChanged();
-////                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ModelPlaylist> call, Throwable t) {
-//                Log.e(TAG, "onFailure playlist: ", t);
-//            }
-//        });
-//"https://www.googleapis.com/youtube/v3/playlists?part=snippet%2C%20contentDetails&channelId=UCMnR3J-chev22dTqJEquFcg&key=AIzaSyC583ei0acTyI6_M1bKLeserE8nJjecrAg"

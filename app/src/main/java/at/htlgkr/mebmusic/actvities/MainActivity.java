@@ -12,18 +12,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -31,24 +22,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
+
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import at.htlgkr.mebmusic.R;
 import at.htlgkr.mebmusic.fragment.PlaylistFragment;
@@ -56,7 +42,8 @@ import at.htlgkr.mebmusic.fragment.ProfileFragment;
 import at.htlgkr.mebmusic.fragment.SearchFragment;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks{
+
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, EasyPermissions.PermissionCallbacks {
 
     private static String profile_picture_url;
     private static String name;
@@ -75,17 +62,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private GoogleSignInOptions gso;
 
     private BottomNavigationView menuBottomNavigationView;
-    private Button buttonLogout;
 
-    private GoogleAccountCredential mCredential;
-
-    ProgressDialog mProgress;
+    private MainActivity mAct;
 
     private static final int RQ_RESULT_START_ACTIVITY = 1;
-    private static final int RQ_ACCOUNT_PICKER = 1000;
-    private static final int RQ_AUTHORIZATION = 1001;
-    private static final int RQ_GOOGLE_PLAY_SERVICES = 1002;
-    private static final int RQ_PERMISSION_GET_ACCOUNTS = 1003;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                             String channelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
 
-                            if (channelId.equals("")){
+                            if (channelId.equals("")) {
                                 channelId = "UCMnR3J-chev22dTqJEquFcg";
                             }
 
@@ -141,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                             String chanelId = prefs.getString("edit_text_channelId", "UCMnR3J-chev22dTqJEquFcg");
 
-                            if (chanelId.equals("")){
+                            if (chanelId.equals("")) {
                                 chanelId = "UCMnR3J-chev22dTqJEquFcg";
                             }
 
@@ -187,8 +167,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    private void handleSignInResult(GoogleSignInResult result){
-        if(result.isSuccess()){
+    private void handleSignInResult(GoogleSignInResult result) {
+        if (result.isSuccess()) {
             GoogleSignInAccount account = result.getSignInAccount();
 
             profile_picture_url = null;
@@ -196,15 +176,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             email = null;
             id = null;
 
-            if(account.getPhotoUrl() != null){
+            if (account.getPhotoUrl() != null) {
                 profile_picture_url = account.getPhotoUrl().toString();
             }
             name = account.getDisplayName();
             email = account.getEmail();
             id = account.getId();
-
-
-
         }
     }
 
@@ -214,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
 
-        if (opr.isDone()){
+        if (opr.isDone()) {
             GoogleSignInResult result = opr.get();
             handleSignInResult(result);
         } else {
@@ -227,13 +204,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    public void setFragment(Fragment fragment){
+    public void setFragment(Fragment fragment) {
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_main, fragment);
         ft.commit();
     }
 
-    public void setPlaylistFragment(){
+    public void setPlaylistFragment() {
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_main, playlistFragment);
         ft.commit();
@@ -242,11 +219,40 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-
     }
-}
+
+    //notifications implementation:
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public void showNotification() {
+        Context context = this;
+
+        networkAvailable = isNetworkAvailable();
+        if (networkAvailable == false) {
+            Notification.Builder builder = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                builder = new Notification.Builder(context, CHANNEL_ID)
+                        .setSmallIcon(android.R.drawable.star_big_on)
+                        .setColor(Color.YELLOW)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText("You are not connected to a network!")
+                        .setStyle(new Notification.BigTextStyle()
+                                .bigText("Please connect to a network, to access all the functions in the app."))
+                        .setWhen(System.currentTimeMillis())
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setAutoCancel(true);
+            }
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.notify(NOTIFICATION_ID_STANDARD, builder.build());
+        }
+    }
